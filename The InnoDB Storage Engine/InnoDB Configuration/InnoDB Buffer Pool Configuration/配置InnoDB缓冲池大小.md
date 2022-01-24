@@ -182,23 +182,21 @@ mysql> SELECT @@innodb_buffer_pool_size;
 
 更改 innodb_buffer_pool_chunk_size 时应小心，因为更改此值会增加缓冲池的大小，如上面的示例所示。 在更改 innodb_buffer_pool_chunk_size 之前，计算对 innodb_buffer_pool_size 的影响，以确保生成的缓冲池大小是可以接受的。
 
-笔记
+> 笔记
 为避免潜在的性能问题，块的数量（innodb_buffer_pool_size / innodb_buffer_pool_chunk_size）不应超过 1000。
 
 ## 在线配置 InnoDB 缓冲池大小
 
-innodb_buffer_pool_size 配置选项可以使用 SET 语句动态设置，允许您在不重新启动服务器的情况下调整缓冲池的大小。
+innodb_buffer_pool_size 配置选项可以使用 SET 语句动态设置，允许您在不重新启动服务器的情况下调整缓冲池的大小，此方法取值必须用字节数表示。
 
 `mysql> SET GLOBAL innodb_buffer_pool_size=402653184;`
 
-笔记
+>笔记
 缓冲池大小必须等于或倍数 innodb_buffer_pool_chunk_size * innodb_buffer_pool_instances。更改这些变量设置需要重新启动服务器。
 
-Active transactions and operations performed through InnoDB APIs should be completed before resizing the buffer pool. When initiating a resizing operation, the operation does not start until all active transactions are completed. Once the resizing operation is in progress, new transactions and operations that require access to the buffer pool must wait until the resizing operation finishes. The exception to the rule is that concurrent access to the buffer pool is permitted while the buffer pool is defragmented and pages are withdrawn when buffer pool size is decreased. A drawback of allowing concurrent access is that it could result in a temporary shortage of available pages while pages are being withdrawn.
+通过 InnoDB API 执行的活动事务和操作(Active transactions and operations)应在调整缓冲池大小之前完成。启动调整大小操作时，直到所有活动事务都完成后操作才会开始。一旦调整大小操作正在进行，需要访问缓冲池的新事务和操作必须等到调整大小操作完成。该规则的例外是允许对缓冲池进行并发(concurrent access)访问，同时对缓冲池进行碎片整理，并在缓冲池大小减小时撤回页面。允许并发访问的一个缺点是它可能导致在页面被撤回(withdrawn)时可用页面暂时短缺。
 
-通过 InnoDB API 执行的活动事务和操作应在调整缓冲池大小之前完成。启动调整大小操作时，直到所有活动事务都完成后操作才会开始。一旦调整大小操作正在进行，需要访问缓冲池的新事务和操作必须等到调整大小操作完成。该规则的例外是允许对缓冲池进行并发访问，同时对缓冲池进行碎片整理，并在缓冲池大小减小时撤回页面。允许并发访问的一个缺点是它可能导致在页面被撤回时可用页面暂时短缺。
-
-笔记
+>笔记
 Nested transactions could fail if initiated after the buffer pool resizing operation begins.
 如果在缓冲池大小调整操作开始后启动嵌套事务，则可能会失败。
 
@@ -252,7 +250,7 @@ The resizing operation is performed by a background thread.
 * Converts hash tables, lists, and pointers to use new addresses in memory 转换哈希表、列表和指针以使用内存中的新地址
 * Adds new pages to the free list 将新页面添加到空闲列表
 
-当这些操作正在进行时，其他线程被阻止访问缓冲池。.
+当这些操作正在进行时，其他线程被阻止访问缓冲池。
 
 减小缓冲池大小时，调整大小操作:
 
