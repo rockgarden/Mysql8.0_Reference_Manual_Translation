@@ -1,7 +1,7 @@
-## 第11章 数据类型
+# 第11章 数据类型
 > 原文地址：[https://dev.mysql.com/doc/refman/8.0/en/data-types.html](https://dev.mysql.com/doc/refman/8.0/en/data-types.html)
 
-### 目录
+## 目录
 
 - [11.1 数值型](data-types/numeric-types.md)
 - [11.2 时间和日期类型](data-types/)

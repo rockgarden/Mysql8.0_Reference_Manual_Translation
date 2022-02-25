@@ -1,4 +1,5 @@
-## 目录
+# 目录
+
 - [前言(完结)](preface.md)
 - [第1章：一般信息（翻译中）](The_Introduction.md)
 - [第2章：安装和升级MySQL（未开始）]
