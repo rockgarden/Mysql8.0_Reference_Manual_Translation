@@ -12,7 +12,7 @@
 
 `mysqlbinlog binlog.0000003`
 
-输出包括 binlog.000003 中包含的事件。 对于基于语句的日志记录，事件信息包括 SQL 语句、执行它的服务器的 ID、执行语句时的时间戳、花费的时间等等。 对于基于行的日志记录，事件指示行更改而不是 SQL 语句。 有关日志记录模式的信息，请参见第 [17.2.1 节，“复制格式”](https://dev.mysql.com/doc/refman/8.0/en/replication-formats.html)。
+输出包括 binlog.000003 中包含的事件。 对于基于语句的日志记录，事件信息包括 SQL 语句、执行它的服务器的 ID、执行语句时的时间戳、花费的时间等等。 对于基于行的日志记录，事件指示行更改而不是 SQL 语句。 有关日志记录模式的信息，请参见第 [“复制格式”](https://dev.mysql.com/doc/refman/8.0/en/replication-formats.html)。
 
 事件前面有提供附加信息的标题注释。 例如：
 
@@ -29,13 +29,17 @@
 > 笔记
 使用事件组时，可以将事件的文件偏移量归为一组，将事件的注释归为一组。 不要将这些分组事件误认为是空白文件偏移。
 
-mysqlbinlog 的输出可以重新执行（例如，通过将其用作 mysql 的输入）以重做日志中的语句。这对于服务器意外退出后的恢复操作很有用。有关其他使用示例，请参阅本节后面和第 [7.5 节“时间点（增量）恢复”](https://dev.mysql.com/doc/refman/8.0/en/point-in-time-recovery.html) 中的讨论。要执行 mysqlbinlog 使用的内部使用 BINLOG 语句，用户需要 BINLOG_ADMIN 权限（或已弃用的 SUPER 权限），或 REPLICATION_APPLIER 权限以及执行每个日志事件的适当权限。
+windows环境复杂命令示例：
+
+`mysqlbinlog --no-defaults --base64-output=decode-rows -vv --start-datetime="2022-04-14 10:50:00" "D:\Program Files\MySQL8\mysql-8.0.19-winx64\Data\binlog.000128" -r D:\tmp\binlog000128.sql`
+
+mysqlbinlog 的输出可以重新执行（例如，通过将其用作 mysql 的输入）以重做日志中的语句。这对于服务器意外退出后的恢复操作很有用。有关其他使用示例，请参阅本节后面和第 [“时间点（增量）恢复”](https://dev.mysql.com/doc/refman/8.0/en/point-in-time-recovery.html) 中的讨论。要执行 mysqlbinlog 使用的内部使用 BINLOG 语句，用户需要 BINLOG_ADMIN 权限（或已弃用的 SUPER 权限），或 REPLICATION_APPLIER 权限以及执行每个日志事件的适当权限。
 
 您可以使用 mysqlbinlog 直接读取二进制日志文件并将它们应用到本地 MySQL 服务器。您还可以使用 `--read-from-remote-server` 选项从远程服务器读取二进制日志。要读取远程二进制日志，可以给出连接参数选项来指示如何连接到服务器。这些选项是`--host`、`--password`、`--port`、`--protocol`、`--socket` 和`--user`。
 
-当二进制日志文件被加密时，可以从 MySQL 8.0.14 开始，mysqlbinlog 不能直接读取它们，但可以使用 `--read-from-remote-server` 选项从服务器读取它们。当服务器的 binlog_encryption 系统变量设置为 ON 时，二进制日志文件被加密。 SHOW BINARY LOGS 语句显示特定二进制日志文件是加密的还是未加密的。加密和未加密的二进制日志文件也可以使用加密日志文件（0xFD62696E）的文件头开头的幻数来区分，这与未加密的日志文件（0xFE62696E）不同。请注意，从 MySQL 8.0.14 开始，如果您尝试直接读取加密的二进制日志文件，mysqlbinlog 会返回一个合适的错误，但旧版本的 mysqlbinlog 根本不会将该文件识别为二进制日志文件。有关二进制日志加密的更多信息，请参阅第 [“加密二进制日志文件和中继日志文件”](https://dev.mysql.com/doc/refman/8.0/en/replication-binlog-encryption.html)。
+当二进制日志文件被加密时，从 MySQL 8.0.14 开始，mysqlbinlog 不能直接读取它们，但可以使用 `--read-from-remote-server` 选项从服务器读取它们。当服务器的 binlog_encryption 系统变量设置为 ON 时，二进制日志文件被加密。 SHOW BINARY LOGS 语句显示特定二进制日志文件是加密的还是未加密的。加密和未加密的二进制日志文件也可以使用加密日志文件（0xFD62696E）的文件头开头的幻数来区分，这与未加密的日志文件（0xFE62696E）不同。请注意，从 MySQL 8.0.14 开始，如果您尝试直接读取加密的二进制日志文件，mysqlbinlog 会返回一个合适的错误，但旧版本的 mysqlbinlog 根本不会将该文件识别为二进制日志文件。有关二进制日志加密的更多信息，请参阅第 [“加密二进制日志文件和中继日志文件”](https://dev.mysql.com/doc/refman/8.0/en/replication-binlog-encryption.html)。
 
-当二进制日志事务有效负载已被压缩时，可以从 MySQL 8.0.20 开始，该版本的 mysqlbinlog 版本会自动解压缩和解码事务有效负载，并像未压缩事件一样打印它们。旧版本的 mysqlbinlog 无法读取压缩的事务有效负载。当服务器的 binlog_transaction_compression 系统变量设置为 ON 时，事务有效负载被压缩，然后作为单个事件（Transaction_payload_event）写入服务器的二进制日志文件。使用 `--verbose` 选项，mysqlbinlog 添加注释，说明使用的压缩算法、最初接收的压缩有效负载大小以及解压缩后产生的有效负载大小。
+当二进制日志事务有效负载已被压缩时，从 MySQL 8.0.20 开始，该版本的 mysqlbinlog 会自动解压缩和解码事务有效负载，并像未压缩事件一样打印它们。旧版本的 mysqlbinlog 无法读取压缩的事务有效负载。当服务器的 binlog_transaction_compression 系统变量设置为 ON 时，事务有效负载被压缩，然后作为单个事件（Transaction_payload_event）写入服务器的二进制日志文件。使用 `--verbose` 选项，mysqlbinlog 添加注释，说明使用的压缩算法、最初接收的压缩有效负载大小以及解压缩后产生的有效负载大小。
 
 > 笔记
 mysqlbinlog 为作为压缩事务有效负载一部分的单个事件声明的结束位置 (end_log_pos) 与原始压缩有效负载的结束位置相同。 因此，多个解压缩事件可以具有相同的结束位置。
@@ -238,6 +242,14 @@ mysqlbinlog --database=db2 不输出前两个 INSERT 语句，因为没有默认
 程序退出（事务结束）时打印一些调试信息。
 
 仅当 MySQL 使用 WITH_DEBUG 构建时，此选项才可用。 Oracle 提供的 MySQL 发布二进制文件不是使用此选项构建的。
+
+#### --no-defaults
+
+不要读取任何选项文件。 如果由于从选项文件中读取未知选项而导致程序启动失败，可以使用 --no-defaults 来防止它们被读取。
+
+例外是在所有情况下都会读取 .mylogin.cnf 文件（如果存在）。 这允许以比在命令行上更安全的方式指定密码，即使使用 `--no-defaults` 也是如此。 要创建 .mylogin.cnf，请使用 mysql_config_editor 实用程序。 请参阅第“[mysql_config_editor - MySQL 配置实用程序](https://dev.mysql.com/doc/refman/8.0/en/mysql-config-editor.html)”。
+
+有关此选项文件选项和其他选项文件选项的更多信息，请参阅第“[影响选项文件处理的命令行选项](https://dev.mysql.com/doc/refman/8.0/en/option-file-options.html)”。
 
 #### --short-form, -s
 
@@ -463,7 +475,7 @@ $> mysqlbinlog -v --base64-output=DECODE-ROWS log_file
 > 笔记
 如果您打算重新执行 mysqlbinlog 输出，则不应禁止 BINLOG 语句。
 
-由 --verbose 为行事件生成的 SQL 语句比相应的 BINLOG 语句更具可读性。但是，它们与生成事件的原始 SQL 语句并不完全对应。以下限制适用：
+由 `--verbose` 为行事件生成的 SQL 语句比相应的 BINLOG 语句更具可读性。但是，它们与生成事件的原始 SQL 语句并不完全对应。以下限制适用：
 
 * 原始列名丢失并被 @N 替换，其中 N 是列号。
 * 二进制日志中没有字符集信息，影响字符串列显示：
@@ -481,7 +493,7 @@ CHAR(2) CHARACTER SET ucs2
 
 如果已知二进制日志不包含任何需要 BINLOG 语句的事件（即没有行事件），则可以使用 `--base64-output=NEVER` 选项来防止写入此标头。
 
-## 4.6.9.3 使用 mysqlbinlog 备份二进制日志文件
+## 使用 mysqlbinlog 备份二进制日志文件
 
 默认情况下，mysqlbinlog 读取二进制日志文件并以文本格式显示其内容。这使您能够更轻松地检查文件中的事件并重新执行它们（例如，通过使用输出作为 mysql 的输入）。 mysqlbinlog 可以直接从本地文件系统读取日志文件，或者，使用 `--read-from-remote-server` 选项，它可以连接到服务器并从该服务器请求二进制日志内容。 mysqlbinlog 将文本输出写入其标准输出，或者写入以 `--result-file=file_name` 选项的值命名的文件（如果给定了该选项）。
 
