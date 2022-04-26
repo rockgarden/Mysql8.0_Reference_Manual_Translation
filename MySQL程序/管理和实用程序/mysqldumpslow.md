@@ -17,10 +17,16 @@ Count: 1  Time=4.32s (4s)  Lock=0.00s (0s)  Rows=0.0 (0), root[root]@localhost
 
 Count: 3  Time=2.53s (7s)  Lock=0.00s (0s)  Rows=0.0 (0), root[root]@localhost
  insert into t2 select * from t1 limit N
-
-Count: 3  Time=2.13s (6s)  Lock=0.00s (0s)  Rows=0.0 (0), root[root]@localhost
- insert into t1 select * from t1
 ```
+
+macOS 10：
+打开终端应用（zsh），用绝对路径调用程序：
+`/usr/local/mysql/bin/mysqldumpslow [log_file]`
+也可进入应用程序所在目录调用：
+`./mysqldumpslow [log_file]`
+> 注意
+在未配置basedir的情况下必须指定log_file否则报错
+Can't determine basedir from 'my_print_defaults mysqld' output:  at ./mysqldumpslow line 61.
 
 mysqldumpslow 支持以下选项。
 
