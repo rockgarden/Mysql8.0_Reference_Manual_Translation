@@ -31,7 +31,7 @@
 
 windows环境复杂命令示例：
 
-`mysqlbinlog --no-defaults --base64-output=decode-rows -vv --start-datetime="2022-04-14 10:50:00" "D:\Program Files\MySQL8\mysql-8.0.19-winx64\Data\binlog.000128" -r D:\tmp\binlog000128.sql`
+`mysqlbinlog --no-defaults --base64-output=decode-rows -vv --start-datetime="2022-04-14 10:50:00" --stop-datetime="2022-04-14 10:50:00"  "D:\Program Files\MySQL8\mysql-8.0.19-winx64\Data\binlog.000128" -r D:\tmp\binlog000128.sql`
 
 mysqlbinlog 的输出可以重新执行（例如，通过将其用作 mysql 的输入）以重做日志中的语句。这对于服务器意外退出后的恢复操作很有用。有关其他使用示例，请参阅本节后面和第 [“时间点（增量）恢复”](https://dev.mysql.com/doc/refman/8.0/en/point-in-time-recovery.html) 中的讨论。要执行 mysqlbinlog 使用的内部使用 BINLOG 语句，用户需要 BINLOG_ADMIN 权限（或已弃用的 SUPER 权限），或 REPLICATION_APPLIER 权限以及执行每个日志事件的适当权限。
 
