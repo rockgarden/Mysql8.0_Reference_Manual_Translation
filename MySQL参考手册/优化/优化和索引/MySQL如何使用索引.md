@@ -2,9 +2,9 @@
 
 索引用于快速查找具有特定列值的行。如果没有索引，MySQL 必须从第一行开始，然后读取整个表以查找相关行。桌子越大，成本越高。如果表有相关列的索引，MySQL 可以快速确定要在数据文件中间查找的位置，而无需查看所有数据。这比顺序读取每一行要快得多。
 
-大多数 MySQL 索引（PRIMARY KEY、UNIQUE、INDEX 和 FULLTEXT）都存储在 [B-trees](https://dev.mysql.com/doc/refman/8.0/en/glossary.html#glos_b_tree) 中。例外：空间数据类型的索引使用 R-trees； MEMORY 表也支持[散列索引](https://dev.mysql.com/doc/refman/8.0/en/glossary.html#glos_hash_index)； InnoDB 对 FULLTEXT 索引使用倒排列表。
+大多数 MySQL 索引（PRIMARY KEY、UNIQUE、INDEX 和 FULLTEXT）都存储在 [B-trees](../../词汇表.md#b树) 中。例外：空间数据类型的索引使用 R-trees； MEMORY 表也支持[散列索引](../../词汇表.md#哈希索引)； InnoDB 对 FULLTEXT 索引使用倒排列表。
 
-一般来说，索引的使用如以下讨论中所述。[第 8.3.9 节“B-Tree 和哈希索引的比较”](https://dev.mysql.com/doc/refman/8.0/en/index-btree-hash.html)中描述了哈希索引的特定特征（如 MEMORY 表中使用的）。
+一般来说，索引的使用如以下讨论中所述。[“B-Tree 和哈希索引的比较”](B-Tree和Hash索引的比较.md)中描述了哈希索引的特定特征（如 MEMORY 表中使用的）。
 
 MySQL 对这些操作使用索引：
 
