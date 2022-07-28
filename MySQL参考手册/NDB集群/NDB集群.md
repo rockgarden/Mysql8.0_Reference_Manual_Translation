@@ -1,21 +1,24 @@
-# MySQL NDB 集群
+
+# MySQL NDB 集群 8.0
 
 <https://dev.mysql.com/doc/refman/8.0/en/mysql-cluster.html>
 
-目录
+## 目录
 
 [23.1 一般信息](#一般信息)
-[23.2 NDB 集群概述](NDB集群概述/NDB集群概述.md)
-23.3 NDB集群安装
+[23.2 NDB集群概述](NDB集群概述/NDB集群概述.md)
+[23.3 NDB集群安装](NDB集群安装/NDB集群安装.md)
 23.4 NDB集群的配置
-23.5 NDB 集群程序
+23.5 NDB集群程序
 23.6 NDB集群的管理
-23.7 NDB 集群复制
-23.8 NDB 集群发行说明
+23.7 NDB集群复制
+23.8 NDB集群发行说明
 
-本章提供有关 MySQL NDB Cluster 的信息，这是适用于分布式计算环境的 MySQL 的高可用性、高冗余版本。最新的 NDB Cluster 版本系列使用 NDB 存储引擎（也称为 NDBCLUSTER）的版本 8 来支持在集群中运行具有 MySQL 服务器和其他软件的多台计算机。 NDB Cluster 8.0 现在作为通用可用性 (GA) 版本（从版本 8.0.19 开始）提供，包含 NDB 存储引擎的版本 8.0。 NDB Cluster 7.6 和 NDB Cluster 7.5 仍可作为 GA 版本使用，分别使用 NDB 的 7.6 和 7.5 版本。
+## 概述
 
-本章包含有关 NDB Cluster 8.0 版本到 8.0.30 的信息。 NDB Cluster 8.0 现在作为通用版本发布（从 NDB 8.0.19 开始），建议用于新部署；最新的可用版本是 NDB 8.0.28。 NDB Cluster 7.6 和 7.5 是以前的 GA 版本，仍然支持生产。
+本章提供有关 MySQL NDB Cluster 的信息，这是适用于分布式计算环境的 MySQL 的高可用性、高冗余版本。最新的 NDB Cluster 发布系列使用 NDB 存储引擎（也称为 NDBCLUSTER）的版本 8 来支持在集群中运行具有 MySQL 服务器和其他软件的多台计算机。 NDB Cluster 8.0 现在作为通用可用性 (GA) 版本（从版本 8.0.19 开始）提供，包含 NDB 存储引擎的版本 8.0。 NDB Cluster 7.6 和 NDB Cluster 7.5 仍可作为 GA 版本使用，分别使用 NDB 的 7.6 和 7.5 版本。以前的 GA 版本仍可用于生产，NDB Cluster 7.4 和 NDB Cluster 7.3，分别包含 NDB 版本 7.4 和 7.3。 NDB 7.2 和更早的版本系列不再受支持或维护。
+
+本章包含有关 NDB Cluster 8.0 版本到 8.0.30 的信息。 NDB Cluster 8.0 现在作为通用版本发布（从 NDB 8.0.19 开始），建议用于新部署；最新的可用版本是 NDB 8.0.28。
 
 ## 一般信息
 
@@ -89,3 +92,4 @@ NDB Cluster 8.0 从 NDB 8.0.19 开始作为通用版本发布，建议用于新�
 - 有关 NDB Cluster 的一些常见问题的答案，请参阅[第 A.10 节，“MySQL 8.0 FAQ：NDB Cluster”](https://dev.mysql.com/doc/refman/8.0/en/faqs-mysql-cluster.html)。
 - NDB 集群论坛：<https://forums.mysql.com/list.php?25>。
 - 许多 NDB Cluster 用户和开发人员在博客中讲述了他们使用 NDB Cluster 的经历，并通过 [PlanetMySQL](http://www.planetmysql.org/) 提供了这些信息。
+

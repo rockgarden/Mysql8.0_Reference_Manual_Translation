@@ -2,7 +2,7 @@
 
 NDB Cluster 的优势之一是它可以在商用硬件上运行，并且在这方面没有异常要求，除了大量 RAM，因为所有实时数据存储都在内存中完成。 （可以使用磁盘数据表来降低此要求——有关这些的更多信息，请参见[第 23.6.10 节，“NDB Cluster 磁盘数据表”](https://dev.mysql.com/doc/refman/8.0/en/mysql-cluster-disk-data.html)。）自然，多个更快的 CPU 可以提高性能。其他 NDB Cluster 进程的内存需求相对较小。
 
-NDB Cluster 的软件要求也适中。主机操作系统不需要任何不寻常的模块、服务、应用程序或配置来支持 NDB Cluster。对于支持的操作系统，标准安装就足够了。 MySQL 软件要求很简单：只需要​​ NDB Cluster 的生产版本。仅仅为了能够使用 NDB Cluster，不必自己编译 MySQL。我们假设您正在使用适合您平台的二进制文件，可从 NDB Cluster 软件下载页面 https://dev.mysql.com/downloads/cluster/ 获得。
+NDB Cluster 的软件要求也适中。主机操作系统不需要任何不寻常的模块、服务、应用程序或配置来支持 NDB Cluster。对于支持的操作系统，标准安装就足够了。 MySQL 软件要求很简单：只需要​​ NDB Cluster 的生产版本。仅仅为了能够使用 NDB Cluster，不必自己编译 MySQL。我们假设您正在使用适合您平台的二进制文件，可从 NDB Cluster 软件下载页面 <https://dev.mysql.com/downloads/cluster/> 获得。
 
 对于节点之间的通信，NDB Cluster 支持任何标准拓扑中的 TCP/IP 网络，并且每个主机的最低要求是标准的 100 Mbps 以太网卡，以及为整个集群提供网络连接的交换机、集线器或路由器.我们强烈建议 NDB Cluster 在其自己的子网上运行，该子网不与不属于集群的机器共享，原因如下：
 
