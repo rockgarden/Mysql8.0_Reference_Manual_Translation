@@ -1,13 +1,15 @@
 # NDB 集群概述
 
+<https://dev.mysql.com/doc/refman/8.0/en/mysql-cluster-overview.html>
+
 ## 目录
 
-23.2.1 NDB 集群核心概念
-23.2.2 NDB Cluster 节点、节点组、片段副本和分区
+[23.2.1 NDB 集群核心概念](NDB集群核心概念.md)
+[23.2.2 NDB Cluster 节点、节点组、片段副本和分区](NDB节点和分区.md)
 [23.2.3 NDB Cluster 硬件、软件和网络要求](NDB资源要求.md)
 23.2.4 NDB Cluster 中的新增功能
 23.2.5 NDB 8.0 中添加、弃用或删除的选项、变量和参数
-23.2.6 MySQL 服务器使用 InnoDB 与 NDB Cluster 比较
+[23.2.6 MySQL 服务器使用 InnoDB 与 NDB Cluster 比较](InnoDB与NDB的比较.md)
 [23.2.7 NDB Cluster 的已知限制](NDB集群的已知限制/NDB集群的已知限制.md)
 
 ## 概述

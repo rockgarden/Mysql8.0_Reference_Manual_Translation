@@ -92,4 +92,3 @@ NDB Cluster 8.0 从 NDB 8.0.19 开始作为通用版本发布，建议用于新�
 - 有关 NDB Cluster 的一些常见问题的答案，请参阅[第 A.10 节，“MySQL 8.0 FAQ：NDB Cluster”](https://dev.mysql.com/doc/refman/8.0/en/faqs-mysql-cluster.html)。
 - NDB 集群论坛：<https://forums.mysql.com/list.php?25>。
 - 许多 NDB Cluster 用户和开发人员在博客中讲述了他们使用 NDB Cluster 的经历，并通过 [PlanetMySQL](http://www.planetmysql.org/) 提供了这些信息。
-

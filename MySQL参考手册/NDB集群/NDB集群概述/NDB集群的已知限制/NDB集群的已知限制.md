@@ -1,5 +1,6 @@
 # NDB Cluster 的已知限制
 
+<https://dev.mysql.com/doc/refman/8.0/en/mysql-cluster-limitations.html>
 ## 目录
 
 [23.2.7.1 NDB Cluster 中不符合 SQL 语法](不符合NDB集群中的SQL语法.md)
