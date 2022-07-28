@@ -1,9 +1,11 @@
 # MySQL NDB 集群
 
+<https://dev.mysql.com/doc/refman/8.0/en/mysql-cluster.html>
+
 目录
 
-23.1 一般信息
-23.2 NDB 集群概述
+[23.1 一般信息](#一般信息)
+[23.2 NDB 集群概述](NDB集群概述/NDB集群概述.md)
 23.3 NDB集群安装
 23.4 NDB集群的配置
 23.5 NDB 集群程序

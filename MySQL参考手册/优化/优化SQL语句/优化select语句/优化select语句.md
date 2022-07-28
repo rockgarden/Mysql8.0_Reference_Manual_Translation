@@ -1,5 +1,31 @@
 # Optimizing SELECT Statements
 
+<https://dev.mysql.com/doc/refman/8.0/en/select-optimization.html>
+
+8.2.1.1 WHERE 子句优化
+8.2.1.2 范围优化
+8.2.1.3 索引合并优化
+8.2.1.4 哈希连接优化
+8.2.1.5 发动机工况下推优化
+8.2.1.6 索引条件下推优化
+8.2.1.7 嵌套循环连接算法
+8.2.1.8 嵌套连接优化
+8.2.1.9 外连接优化
+8.2.1.10 外连接简化
+8.2.1.11 多范围读取优化
+8.2.1.12 阻止嵌套循环和批量密钥访问连接
+8.2.1.13 条件过滤
+8.2.1.14 恒定折叠优化
+[8.2.1.15 IS NULL 优化](IS%20NULL优化.md)
+[8.2.1.16 ORDER BY 优化](按优化排序.md)
+8.2.1.17 GROUP BY 优化
+8.2.1.18 DISTINCT 优化
+8.2.1.19 LIMIT 查询优化
+8.2.1.20 函数调用优化
+8.2.1.21 窗函数优化
+8.2.1.22 行构造函数表达式优化
+8.2.1.23 避免全表扫描
+
 查询以 SELECT 语句的形式执行数据库中的所有查找操作。调整这些语句是重中之重，无论是实现动态网页的亚秒级响应时间，还是缩短生成大量隔夜报告的时间。
 
 除了 SELECT 语句，查询的调优技术也适用于 CREATE TABLE...AS SELECT、INSERT INTO...SELECT 和 DELETE 语句中的 WHERE 子句等结构。这些语句有额外的性能考虑，因为它们结合了写操作和面向读的查询操作。
@@ -17,6 +43,6 @@ NDB Cluster 支持连接下推优化，其中合格的连接被完整地发送�
 - 您可以使用第 [8.5.3 节“优化 InnoDB 只读事务”](https://dev.mysql.com/doc/refman/8.0/en/innodb-performance-ro-txn.html)中的技术来优化 InnoDB 表的单查询事务。
 - 避免以难以理解的方式转换查询，尤其是在优化器自动执行某些相同的转换时。Avoid transforming the query in ways that make it hard to understand, especially if the optimizer does some of the same transformations automatically.
 - 如果性能问题不能通过基本准则之一轻松解决，请通过阅读 EXPLAIN 计划并调整索引、WHERE 子句、连接子句等来调查特定查询的内部细节。（当您达到一定的专业水平时，阅读 EXPLAIN 计划可能是您每次查询的第一步。）
-- 调整 MySQL 用于缓存的内存区域的大小和属性。通过有效使用 InnoDB 缓冲池、MyISAM 键缓存和 MySQL 查询缓存，重复查询运行得更快，因为结果是从内存中检索的第二次和后续时间(the results are retrieved from memory the second and subsequent times.)。
+- 调整 MySQL 用于缓存(buffer pool)的内存区域的大小和属性。通过有效使用 InnoDB 缓冲池、MyISAM 键缓存和 MySQL 查询缓存，重复查询运行得更快，因为结果是从内存中检索的第二次和后续时间(the results are retrieved from memory the second and subsequent times.)。
 - 即使对于使用缓存内存区域快速运行的查询，您仍然可以进一步优化，以便它们需要更少的缓存内存，从而使您的应用程序更具可扩展性。可扩展性意味着您的应用程序可以处理更多的并发用户、更大的请求等，而不会出现性能大幅下降。
 - 处理锁定问题，您的查询速度可能会受到同时访问表的其他会话的影响。
