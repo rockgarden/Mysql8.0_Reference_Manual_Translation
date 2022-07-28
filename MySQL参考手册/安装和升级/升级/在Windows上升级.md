@@ -42,12 +42,10 @@ MySQL Installer 取消选择同一版本系列中里程碑版本（Pre-Release�
 1、从 <https://dev.mysql.com/downloads/> 下载 MySQL 的最新 Windows ZIP 存档分发。
 
 2、如果服务器正在运行，请停止它。如果服务器作为服务安装，请在命令提示符下使用以下命令停止服务：
-
 `C:\> SC STOP mysqld_service_name`
 或者，使用 NET STOP mysqld_service_name 。
 
 如果您没有将 MySQL 服务器作为服务运行，请使用 [mysqladmin](https://dev.mysql.com/doc/refman/8.0/en/mysqladmin.html) 将其停止。例如，在从 MySQL 5.7 升级到 8.0 之前，使用 MySQL 5.7 中的 mysqladmin，如下所示：
-
 `C:\> "C:\Program Files\MySQL\MySQL Server 5.7\bin\mysqladmin" -u root shutdown`
 
 > 笔记

@@ -12,7 +12,8 @@
 
 下图说明了您在本节中使用的场景：
 
-图 7.2 生产部署 ![Production Deployment](../../resources/production_servers.png)
+图 7.2 生产部署 
+![Production Deployment](../../resources/production_servers.png)
 
 > 重要的
 与沙盒部署不同，在沙盒部署中，所有实例都本地部署到 AdminAPI 可以访问本地文件并可以持久化配置更改的一台机器上，而对于生产部署，您必须持久化实例上的任何配置更改。 如何执行此操作取决于实例上运行的 MySQL 版本，请参阅[第 6.2.4 节，“持久设置”](https://dev.mysql.com/doc/mysql-shell/8.0/en/admin-api-persisting-settings.html)。

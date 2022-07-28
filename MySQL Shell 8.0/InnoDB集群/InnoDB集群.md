@@ -70,7 +70,7 @@ InnoDB Cluster 不提供对 MySQL NDB Cluster 的支持。 NDB Cluster 依赖于
 
 本节介绍 InnoDB Cluster 的已知限制。由于 InnoDB Cluster 使用 Group Replication，您还应该了解它的限制，请参阅 [Group Replication Limitations](https://dev.mysql.com/doc/refman/8.0/en/group-replication-limitations.html)。
 
-> 重要的
+> **重要**
 由于元数据查询中的错误，MySQL Shell 8.0.27 无法用于管理运行 MySQL Server 8.0.25 的 InnoDB Cluster。要解决此问题，请先将 InnoDB Cluster 成员实例上的 MySQL Server 升级到 8.0.26 或 8.0.27 版本，然后再将 MySQL Shell 8.0.27 与集群一起使用。该问题将在 MySQL Shell 8.0.28 中修复。
 
 - InnoDB Cluster 不管理手动配置的异步复制通道。 Group Replication 和 AdminAPI 不能确保异步复制仅在主节点上处于活动状态，并且状态不会跨实例复制。这可能导致复制不再起作用的各种情况，并可能导致脑裂(split brain)。一个 InnoDB Cluster 和另一个 InnoDB Cluster 之间的复制仅受 InnoDB ClusterSet 支持，它可从 MySQL 8.0.27 获得，并管理从活动主读写 InnoDB Cluster 到多个只读副本集群的复制。有关该解决方案的信息，请参阅第 8 章，MySQL InnoDB ClusterSet。
