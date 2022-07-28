@@ -16,7 +16,8 @@ NDB Cluster 将标准 MySQL 服务器与称为 NDB（代表“网络数据库”
 
 NDB Cluster 由一组称为主机的计算机组成，每台计算机运行一个或多个进程。这些称为节点的进程可能包括 MySQL 服务器（用于访问 NDB 数据）、数据节点（用于存储数据）、一个或多个管理服务器，以及可能的其他专用数据访问程序。 NDB Cluster 中这些组件的关系如下所示：
 
-图 23.1 NDB 集群组件![NDB Cluster Components](../../../resources/cluster-components-1.png)
+图 23.1 NDB 集群组件
+![NDB Cluster Components](../../../resources/cluster-components-1.png)
 
 在这个集群中，三个 MySQL 服务器（mysqld 程序）是 SQL 节点，提供对存储数据的四个数据节点（ndbd 程序）的访问。 SQL 节点和数据节点受 NDB 管理服务器（ndb_mgmd 程序）的控制。各种客户端和 API 可以与 SQL 节点交互 - mysql 客户端、MySQL C API、PHP、Connector/J 和 Connector/NET。还可以使用 NDB API 创建自定义客户端，以与数据节点或 NDB 管理服务器交互。 NDB 管理客户端（ndb_mgm 程序）与 NDB 管理服务器交互。
 
