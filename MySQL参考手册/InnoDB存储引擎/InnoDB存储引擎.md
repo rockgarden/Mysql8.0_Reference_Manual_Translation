@@ -9,7 +9,7 @@
 15.3 InnoDB 多版本
 15.4 InnoDB 架构
 [15.5 InnoDB 内存结构](InnoDB内存结构/InnoDB内存结构.md)
-15.6 InnoDB 磁盘结构
+[15.6 InnoDB 磁盘结构](InnoDB磁盘结构/InnoDB磁盘结构.md)
 15.7 InnoDB 锁定和事务模型
 [15.8 InnoDB 配置](InnoDB配置/InnoDB配置.md)
 15.9 InnoDB 表和页面压缩
