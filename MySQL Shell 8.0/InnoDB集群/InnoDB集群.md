@@ -4,10 +4,10 @@
 
 ## 目录
 
-7.1 InnoDB 集群要求
-7.2 InnoDB 集群限制
-7.3 InnoDB Cluster 的用户账户
-7.4 部署生产 InnoDB 集群
+7.1 [InnoDB 集群要求](#innodb-集群要求)
+7.2 [InnoDB 集群限制](#innodb-集群限制)
+7.3 [InnoDB Cluster 的用户账户](InnoDB集群的用户帐户.md)
+7.4 [部署生产 InnoDB 集群](InnoDB集群生产部署.md)
 7.5 配置 InnoDB 集群
 7.6 保护 InnoDB 集群
 7.7 监控 InnoDB 集群

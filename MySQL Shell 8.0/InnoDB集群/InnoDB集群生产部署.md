@@ -1,8 +1,8 @@
 # 部署生产 InnoDB 集群
 
-7.4.1 预检查 InnoDB 集群使用的实例配置
-7.4.2 为 InnoDB 集群使用配置生产实例
-7.4.3 创建 InnoDB 集群
+7.4.1 [预检查 InnoDB 集群使用的实例配置](#预先检查-innodb-集群使用的实例配置)
+7.4.2 [为 InnoDB 集群使用配置生产实例](#为-innodb-集群使用配置生产实例)
+7.4.3 [创建 InnoDB 集群](#创建-innodb-集群)
 7.4.4 向 InnoDB 集群添加实例
 7.4.5 配置 InnoDB 集群端口
 7.4.6 将 MySQL 克隆与 InnoDB 集群一起使用
@@ -12,7 +12,7 @@
 
 下图说明了您在本节中使用的场景：
 
-图 7.2 生产部署 
+图 7.2 生产部署
 ![Production Deployment](../../resources/production_servers.png)
 
 > 重要的
@@ -170,7 +170,7 @@ dba.configureInstance() 方法验证是否有合适的用户可用于集群使�
 
 ### 超级只读模式下的实例配置
 
-每当 Group Replication 停止时，super_read_only 变量就会设置为 ON，以确保不会对实例进行写入。 当您尝试将此类实例与以下 AdminAPI 命令一起使用时，您可以选择在实例上设置 super_read_only=OFF：
+每当 Group Replication 停止时，[super_read_only](https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_super_read_only) 变量就会设置为 ON，以确保不会对实例进行写入。 当您尝试将此类实例与以下 AdminAPI 命令一起使用时，您可以选择在实例上设置 super_read_only=OFF：
 
 - dba.configureInstance()
 - dba.configureLocalInstance()
@@ -193,3 +193,73 @@ Metadata Schema successfully removed.
 ```
 
 显示实例的当前活动会话数。 您必须确保没有应用程序可以无意中写入实例。 通过回答 y，您确认 AdminAPI 可以写入实例。 如果列出的实例有多个打开的会话，请在允许 AdminAPI 设置 super_read_only=OFF 之前谨慎行事。
+
+## 创建 InnoDB 集群
+
+准备好实例后，使用 dba.createCluster() 函数创建集群，使用 MySQL Shell 连接到的实例作为集群的种子实例。 种子实例被复制到您添加到集群的其他实例，使它们成为种子实例的副本。 在此过程中，ic-1 实例用作种子。 当您发出 dba.createCluster(name) MySQL Shell 创建一个经典的 MySQL 协议会话到连接到 MySQL Shell 当前全局会话的服务器实例。 例如，要创建一个名为 testCluster 的集群并将返回的集群分配给一个名为 cluster 的变量：
+
+```bash
+mysql-js> var cluster = dba.createCluster('testCluster')
+Validating instance at icadmin@ic-1:3306...
+This instance reports its own address as ic-1
+Instance configuration is suitable.
+Creating InnoDB cluster 'testCluster' on 'icadmin@ic-1:3306'...
+Adding Seed Instance...
+Cluster successfully created. Use Cluster.addInstance() to add MySQL instances.
+At least 3 instances are needed for the cluster to be able to withstand up to
+one server failure.
+```
+
+这种将返回的集群分配给变量的模式使您能够使用集群对象的方法对集群执行进一步的操作。 返回的 Cluster 对象使用一个新的会话，独立于 MySQL Shell 的全局会话。 这确保了如果您更改 MySQL Shell 全局会话，集群对象将保持其与实例的会话。
+
+为了能够管理集群，您必须确保您拥有具有所需权限的合适用户。 推荐的方法是创建一个管理用户。 如果您在配置实例时没有创建管理用户，请使用 Cluster.setupAdminAccount() 操作。 例如，要创建一个名为 icadmin 的用户，该用户可以管理分配给变量 cluster 的 InnoDB Cluster，请发出：
+
+`mysql-js> cluster.setupAdminAccount("icadmin")`
+
+有关 InnoDB Cluster 管理员帐户的更多信息，请参阅[手动配置 InnoDB Cluster 管理员帐户](https://dev.mysql.com/doc/mysql-shell/8.0/en/innodb-cluster-user-accounts.html#admin-api-configuring-users)。
+
+dba.createCluster() 操作支持 MySQL Shell 的交互选项。 交互式打开时，在以下情况下会出现提示：
+
+- 如果实例属于 Group Replication 组，并且未将 adaptFromGr: true 设置为选项，则会询问您是否要采用复制组。
+- 如果 force: true 未设置为选项，则会要求您确认创建多主集群。
+
+当您运行 dba.createCluster() 并通过运行 Cluster.addInstance() 将更多服务器实例添加到 InnoDB Cluster 时，以下错误将记录到 MySQL 服务器实例的错误日志中。 这些消息是无害的，并且与 AdminAPI 启动组复制的方式有关：
+
+```log
+2020-02-10T10:53:43.727246Z 12 [ERROR] [MY-011685] [Repl] Plugin
+group_replication reported: 'The group name option is mandatory'
+2020-02-10T10:53:43.727292Z 12 [ERROR] [MY-011660] [Repl] Plugin
+group_replication reported: 'Unable to start Group Replication on boot'
+```
+
+> 笔记
+如果您遇到与元数据不可访问相关的错误，您可能配置了环回网络接口。为了正确使用 InnoDB Cluster，请禁用环回接口。
+
+要检查集群是否已创建，请使用集群实例的 status() 函数。请参阅[使用 Cluster.status() 检查集群的状态](https://dev.mysql.com/doc/mysql-shell/8.0/en/monitoring-innodb-cluster.html#check-innodb-cluster-status)。
+
+> Tips
+一旦服务器实例属于一个集群，重要的是只使用 MySQL Shell 和 AdminAPI 管理它们。不支持在实例添加到集群后手动更改组复制的配置。同样，不支持在使​​用 AdminAPI 配置实例后修改对 InnoDB Cluster 至关重要的服务器变量，例如 server_uuid。
+
+当您使用 MySQL Shell 8.0.14 及更高版本创建集群时，您可以设置在将实例从集群中驱逐之前等待的时间量，例如当它们变得无法访问时。将 expelTimeout 选项传递给 dba.createCluster() 操作，该操作在种子实例上配置 [group_replication_member_expel_timeout](https://dev.mysql.com/doc/refman/8.0/en/group-replication-options.html#sysvar_group_replication_member_expel_timeout) 变量。 expelTimeout 选项可以采用 0 到 3600 范围内的整数值。所有运行 MySQL 服务器 8.0.13 及更高版本的实例被添加到配置了 expelTimeout 的集群中，将自动配置为与种子实例上配置的 expelTimeout 值相同.
+
+有关可以传递给 dba.createCluster() 的其他选项的信息，请参阅[第 7.9 节，“修改或解散 InnoDB 集群”](https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-innodb-cluster-working-with-cluster.html)。
+
+### InnoDB Cluster replicationAllowedHost
+
+当您使用 MySQL Shell 8.0.28 及更高版本创建集群时，如果您有安全要求，即 AdminAPI 自动创建的所有帐户都具有严格的身份验证要求，您可以为 replicationAllowedHost 集群配置选项设置一个值。 replicationAllowedHost 选项意味着自动创建的所有帐户只能从允许的主机连接，使用严格的基于子网的过滤。以前，默认情况下，[由 InnoDB Cluster 创建的内部用户帐户](https://dev.mysql.com/doc/mysql-shell/8.0/en/innodb-cluster-user-accounts.html#mysql-innodb-cluster-users-created)可以从任何地方访问。
+
+replicationAllowedHost 选项可以采用字符串值。例如，要创建一个名为 testCluster 的集群并将 replicationAllowedHost 选项设置为 192.0.2.0/24，请发出：
+
+`mysql-js> dba.createCluster('testCluster', {replicationAllowedHost:'192.0.2.0/24'})`
+
+### 配置通信堆栈
+
+从 MySQL Shell 8.0.30 开始，InnoDB Cluster 支持 MySQL 8.0.27 中为 Group Replication 引入的 MySQL 通信堆栈。
+
+选项communicationStack: XCOM|MYSQL 设置组复制系统变量[group_replication_communication_stack](https://dev.mysql.com/doc/refman/8.0/en/group-replication-options.html#sysvar_group_replication_communication_stack) 的值。
+
+例如：
+`mysql-js> dba.createCluster("testCluster", {communicationStack: "xcom"})`
+MYSQL 通信堆栈是为 MySQL 8.0.27 或更高版本创建的所有新集群的默认设置。
+
+有关详细信息，请参阅[第 7.5.9 节，“配置组复制通信堆栈”](https://dev.mysql.com/doc/mysql-shell/8.0/en/shell-admin-api-communication-stack.html)。

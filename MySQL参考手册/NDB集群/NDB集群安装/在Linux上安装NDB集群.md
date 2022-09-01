@@ -1,7 +1,7 @@
 # 在 Linux 上安装 NDB 集群
 
-23.3.1.1 在 Linux 上安装 NDB Cluster 二进制版本
-23.3.1.2 从 RPM 安装 NDB Cluster
+23.3.1.1 [在 Linux 上安装 NDB Cluster 二进制版本](#在-linux-上安装-ndb-cluster-二进制版本)
+23.3.1.2 [从 RPM 安装 NDB Cluster](#从-rpm-安装-ndb-cluster)
 23.3.1.3 使用 .deb 文件安装 NDB Cluster
 23.3.1.4 在 Linux 上从源代码构建 NDB 集群
 
