@@ -2,11 +2,11 @@
 
 与 NDB 表一起使用时，与某些 MySQL 功能相关的一些 SQL 语句会产生错误，如下面的列表中所述：
 
-- **Temporary tables** (临时表)。不支持临时表。尝试创建使用 NDB 存储引擎的临时表或更改现有临时表以使用 NDB 失败，并出现错误表存储引擎“ndbcluster”不支持创建选项“临时”。
+- **Temporary tables** (临时表)。不支持临时表。尝试创建使用 NDB 存储引擎的临时表或更改现有临时表以使用 NDB 失败，并出现错误 `Table storage engine 'ndbcluster' does not support the create option 'TEMPORARY'` 。
 
 - **Indexes and keys in NDB tables** (NDB 表中的索引和键)。 NDB Cluster 表上的键和索引受到以下限制：
 
-  - **Column width**。尝试在宽度大于 3072 字节的 NDB 表列上创建索引成功，但实际上只有前 3072 字节用于索引。在这种情况下，警告Specified key is too long；发出最大密钥长度为 3072 字节，并且 SHOW CREATE TABLE 语句将索引的长度显示为 3072。
+  - **Column width**。尝试在宽度大于 3072 字节的 NDB 表列上创建索引成功，但实际上只有前 3072 字节用于索引。在这种情况下，警告 `Specified key was too long; max key length is 3072 bytes`，并且 SHOW CREATE TABLE 语句将索引的长度显示为 3072。
 
   - **TEXT and BLOB columns**。您不能在使用任何 TEXT 或 BLOB 数据类型的 NDB 表列上创建索引。
 
@@ -17,47 +17,47 @@
 
   - **Prefixes**。没有前缀索引；只能索引整个列。 （如本节前面所述，NDB 列索引的大小始终与列的宽度（以字节为单位）相同，最多并包括 3072 个字节。另请参阅[第 23.2.7.6 节，“NDB Cluster 中不支持或缺少的功能”](https://dev.mysql.com/doc/refman/8.0/en/mysql-cluster-limitations-unsupported.html)，以获取更多信息。）
 
-  - **BIT columns**。 BIT 列不能是主键、唯一键或索引，也不能是复合主键、唯一键或索引的一部分。
+  - **BIT columns**。 [BIT](https://dev.mysql.com/doc/refman/8.0/en/bit-type.html) 列不能是主键、唯一键或索引，也不能是复合主键、唯一键或索引的一部分。
 
   - **AUTO_INCREMENT columns**。与其他 MySQL 存储引擎一样，NDB 存储引擎每个表最多可以处理一个 AUTO_INCREMENT 列，并且必须对该列进行索引。但是，对于没有显式主键的 NDB 表，AUTO_INCREMENT 列会自动定义并用作“隐藏”主键。因此，您不能创建具有 AUTO_INCREMENT 列且没有显式主键的 NDB 表。
 
-以下 CREATE TABLE 语句不起作用，如下所示：
+    以下 CREATE TABLE 语句不起作用，如下所示：
 
-```sql
-# No index on AUTO_INCREMENT column; table has no primary key
-# Raises ER_WRONG_AUTO_KEY
-mysql> CREATE TABLE n (
-    ->     a INT,
-    ->     b INT AUTO_INCREMENT
-    ->     )
-    -> ENGINE=NDB;
-ERROR 1075 (42000): Incorrect table definition; there can be only one auto
-column and it must be defined as a key 
+    ```sql
+    # No index on AUTO_INCREMENT column; table has no primary key
+    # Raises ER_WRONG_AUTO_KEY
+    mysql> CREATE TABLE n (
+        ->     a INT,
+        ->     b INT AUTO_INCREMENT
+        ->     )
+        -> ENGINE=NDB;
+    ERROR 1075 (42000): Incorrect table definition; there can be only one auto
+    column and it must be defined as a key 
 
-# Index on AUTO_INCREMENT column; table has no primary key
-# Raises NDB error 4335
-mysql> CREATE TABLE n (
-    ->     a INT,
-    ->     b INT AUTO_INCREMENT,
-    ->     KEY k (b)
-    ->     )
-    -> ENGINE=NDB;
-ERROR 1296 (HY000): Got error 4335 'Only one autoincrement column allowed per
-table. Having a table without primary key uses an autoincr' from NDBCLUSTER
-```
+    # Index on AUTO_INCREMENT column; table has no primary key
+    # Raises NDB error 4335
+    mysql> CREATE TABLE n (
+        ->     a INT,
+        ->     b INT AUTO_INCREMENT,
+        ->     KEY k (b)
+        ->     )
+        -> ENGINE=NDB;
+    ERROR 1296 (HY000): Got error 4335 'Only one autoincrement column allowed per
+    table. Having a table without primary key uses an autoincr' from NDBCLUSTER
+    ```
 
-以下语句创建一个表，其中包含一个主键、一个 AUTO_INCREMENT 列和该列的索引，并且成功：
+    以下语句创建一个表，其中包含一个主键、一个 AUTO_INCREMENT 列和该列的索引，并且成功：
 
-```sql
-# Index on AUTO_INCREMENT column; table has a primary key
-mysql> CREATE TABLE n (
-    ->     a INT PRIMARY KEY,
-    ->     b INT AUTO_INCREMENT,
-    ->     KEY k (b)
-    ->     )
-    -> ENGINE=NDB;
-Query OK, 0 rows affected (0.38 sec)
-```
+    ```sql
+    # Index on AUTO_INCREMENT column; table has a primary key
+    mysql> CREATE TABLE n (
+      ->     a INT PRIMARY KEY,
+      ->     b INT AUTO_INCREMENT,
+      ->     KEY k (b)
+      ->     )
+      -> ENGINE=NDB;
+    Query OK, 0 rows affected (0.38 sec)
+    ```
 
 - **Restrictions on foreign keys**。 NDB 8.0 中对外键约束的支持与 InnoDB 提供的支持相当，但受到以下限制：
 
@@ -80,7 +80,7 @@ Query OK, 0 rows affected (0.38 sec)
 
 - **字符集和二进制日志文件**。目前，ndb_apply_status 和 ndb_binlog_index 表是使用 latin1 (ASCII) 字符集创建的。由于此表中记录了二进制日志的名称，因此这些表中未正确引用使用非拉丁字符命名的二进制日志文件。这是一个已知问题，我们正在努力解决。 （错误 #50226）
 
-  要解决此问题，请在命名二进制日志文件或设置任何 --basedir、--log-bin 或 --log-bin-index 选项时仅使用 Latin-1 字符。
+  要解决此问题，请在命名二进制日志文件或设置任何 [--basedir](https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_basedir)、[--log-bin](https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-log.html#option_mysqld_log-bin) 或 --log-bin-index 选项时仅使用 Latin-1 字符。
 
 - **Creating NDB tables with user-defined partitioning**。 使用用户定义的分区创建 NDB 表。 NDB Cluster 中对用户定义的分区的支持仅限于 [LINEAR] KEY 分区。在 CREATE TABLE 语句中使用具有 ENGINE=NDB 或 ENGINE=NDBCLUSTER 的任何其他分区类型会导致错误。
 
