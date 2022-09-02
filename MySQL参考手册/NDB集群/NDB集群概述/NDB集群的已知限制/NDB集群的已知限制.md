@@ -5,15 +5,25 @@
 ## 目录
 
 23.2.7.1 [NDB Cluster 中不符合 SQL 语法](不符合NDB集群中的SQL语法.md)
+
 23.2.7.2 [NDB Cluster 与标准 MySQL 限制的限制和差异](#ndb集群与标准mysql限制的限制和差异)
+
 23.2.7.3 [NDB Cluster 中与事务处理相关的限制](https://dev.mysql.com/doc/refman/8.0/en/mysql-cluster-limitations-transactions.html)
+
 23.2.7.4 NDB 集群错误处理
+
 23.2.7.5 与 NDB Cluster 中的数据库对象相关的限制
+
 23.2.7.6 NDB Cluster 中不支持或缺少的功能
+
 23.2.7.7 与 NDB Cluster 中的性能相关的限制
+
 23.2.7.8 NDB Cluster 独有的问题
+
 23.2.7.9 与 NDB Cluster 磁盘数据存储相关的限制
+
 23.2.7.10 与多个 NDB Cluster 节点相关的限制
+
 23.2.7.11 NDB Cluster 8.0 中解决的以前的 NDB Cluster 问题
 
 ## 概述
