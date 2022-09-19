@@ -5,7 +5,7 @@
 ## 目录
 
 [23.3.1 在 Linux 上安装 NDB 集群](在Linux上安装NDB集群.md)
-23.3.2 在 Windows 上安装 NDB Cluster
+[23.3.2 在 Windows 上安装 NDB Cluster](在Windows上安装NDB集群.md)
 [23.3.3 NDB Cluster 的初始配置](NDB集群初始配置.md)
 [23.3.4 NDB Cluster 的初始启动](NDB集群的初始启动.md)
 23.3.5 带有表和数据的 NDB Cluster 示例
