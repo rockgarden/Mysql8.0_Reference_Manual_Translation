@@ -20,4 +20,4 @@ WHERE c1 > const GROUP BY c1, c2, c3;
 
 如果您不使用查询中命名的所有表中的列，MySQL 会在找到第一个匹配项后立即停止扫描任何未使用的表。在以下情况下，假设 t1 在 t2 之前使用（您可以使用 EXPLAIN 检查），当 MySQL 在 t2 中找到第一行时，它会停止从 t2 读取（对于 t1 中的任何特定行）：
 
-SELECT DISTINCT t1.a FROM t1, t2 where t1.a=t2.a;
+`SELECT DISTINCT t1.a FROM t1, t2 where t1.a=t2.a;`
