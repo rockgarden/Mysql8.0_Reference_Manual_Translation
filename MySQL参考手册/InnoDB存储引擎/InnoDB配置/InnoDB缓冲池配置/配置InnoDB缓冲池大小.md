@@ -189,7 +189,7 @@ mysql> SELECT @@innodb_buffer_pool_size;
 
 innodb_buffer_pool_size 配置选项可以使用 SET 语句动态设置，允许您在不重新启动服务器的情况下调整缓冲池的大小，此方法取值必须用字节数表示。
 
-`mysql> SET GLOBAL innodb_buffer_pool_size=402653184;`
+`mysql> SET GLOBAL innodb_buffer_pool_size=603979776;`
 
 >笔记
 缓冲池大小必须等于或倍数 innodb_buffer_pool_chunk_size * innodb_buffer_pool_instances。更改这些变量设置需要重新启动服务器。
