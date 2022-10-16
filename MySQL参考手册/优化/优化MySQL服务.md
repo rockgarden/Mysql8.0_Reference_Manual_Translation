@@ -41,7 +41,7 @@ MySQL分配缓冲区和缓存以提高数据库操作的性能。默认配置旨
 
   对于用CREATE TABLE显式创建的MEMORY表，只有max_heap_table_size系统变量决定表可以增长多少，并且不转换为磁盘格式。
 
-- [MySQL Performance Schema](https://dev.mysql.com/doc/refman/8.0/en/performance-schema.html)是一种低级别监视MySQL服务器执行的功能。Performance Schema以增量方式动态分配内存，将其内存使用扩展到实际的服务器负载，而不是在服务器启动期间分配所需的内存。一旦分配了内存，只有重新启动服务器才能释放内存。有关更多信息，请参阅第27.17节“[性能模式内存分配模型](https://dev.mysql.com/doc/refman/8.0/en/performance-schema-memory-model.html)”。
+- [MySQL Performance Schema](https://dev.mysql.com/doc/refman/8.0/en/performance-schema.html)是一种低级别监视MySQL服务器执行的功能。Performance Schema以增量方式动态分配内存，将其内存使用扩展到实际的服务器负载，而不是在服务器启动期间分配所需的内存。**一旦分配了内存，只有重新启动服务器才能释放内存**。有关更多信息，请参阅第27.17节“[性能模式内存分配模型](https://dev.mysql.com/doc/refman/8.0/en/performance-schema-memory-model.html)”。
 
 - 服务器用于管理客户端连接的每个线程都需要一些特定于线程的空间。下表列出了这些变量以及哪些系统变量控制它们的大小：
 
@@ -51,7 +51,11 @@ MySQL分配缓冲区和缓存以提高数据库操作的性能。默认配置旨
 
   - 结果缓冲区（[net_buffer_length](https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_net_buffer_length)）
 
-  连接缓冲区和结果缓冲区都以等于net_buffer_length字节的大小开始，但根据需要动态扩展到max_allowed_packet字节。在每个SQL语句之后，结果缓冲区缩减为net_buffer_length字节。在语句运行时，也会分配当前语句字符串的副本。
+  连接缓冲区和结果缓冲区都以等于 net_buffer_length 字节的大小开始，但根据需要动态扩展到 max_allowed_packet 字节。在每个SQL语句之后，结果缓冲区缩减为net_buffer_length字节。在语句运行时，也会分配当前语句字符串的副本。
+
+  通常不应更改此变量，但如果内存很少，可以将其设置为客户端发送的预期语句长度。如果语句超过此长度，连接缓冲区将自动扩大。net_buffer_length可以设置的最大值为1MB。
+
+  当通过更改max_allowed_packet变量的值来更改消息缓冲区大小时，如果客户端程序允许，还应更改客户端的缓冲区大小。客户端库中内置的默认max_alloved_packte值为1GB，但个别客户端程序可能会覆盖此值。
 
   每个连接线程都使用内存计算语句摘要。服务器为每个会话分配[max_digest_length](https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_max_digest_length)字节。参见第27.10节“[性能模式语句摘要和采样](https://dev.mysql.com/doc/refman/8.0/en/performance-schema-statement-digests.html)”。
 
