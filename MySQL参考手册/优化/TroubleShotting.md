@@ -59,7 +59,19 @@
     ```
 
    1. `SHOW ENGINES;`
-         1. 可考虑在配置文件中禁用不使用的ENGINE 如 MyISAM，参见 [disabled_storage_engines](https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_disabled_storage_engines)。
+      1. 可考虑在配置文件中禁用不使用的ENGINE 如 MyISAM，参见 [disabled_storage_engines](https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_disabled_storage_engines)。
+   2. 内存消耗分类
+      1. global级共享内存：`show variables where variable_name in ('innodb_buffer_pool_size','innodb_log_buffer_size');`
+      2. session级私有内存：`show variables where variable_name in ('tmp_table_size','sort_buffer_size','read_buffer_size','read_rnd_buffer_size','join_buffer_size','thread_stack', 'binlog_cache_size');`
+         1. tmp_table_size：是MySQL的heap（堆积）表缓冲大小，表示内存中临时表的最大值。如果内存临时表超出了限制，MySQL就会自动地把它转化为基于磁盘的MyISAM表，存储在指定的tmpdir目录下
+         2. sort_buffer_size：执行ORDER BY和GROUP BY排序使用的缓冲大小。如果想要增加ORDER BY的速度，首先看是否可以让MySQL使用索引而不是额外的排序阶段。如果不能，可以尝试增加sort_buffer_size变量的大小。若存储量大于 sort_buffer_size，则会在磁盘生成临时表以完成操作。在 Linux 系统中，当分配空间大于 2 M 时会使用 mmap() 而不是 malloc() 来进行内存分配，导致效率降低。
+         3. read_buffer_size：顺序读缓冲区大小。对表进行顺序扫描的请求将分配一个读入缓冲区，MySQL会为它分配一段内存缓冲区。
+         4. read_rnd_buffer_size：随机读缓冲区大小。当按任意顺序读取行时(例如，按照排序顺序)，将分配一个随机读缓存区。进行排序查询时，MySQL会首先扫描一遍该缓冲，以避免磁盘搜索，提高查询速度，如果需要排序大量数据，可适当调高该值。但MySQL会为每个客户连接发放该缓冲空间，所以应尽量适当设置该值，以避免内存开销过大。
+         5. join_buffer_size：每次join操作都会调用my_malloc、my_free函数申请/释放join_buffer_size的大小的内存。
+         6. thread_stack：每个session连接线程被创建时，MySQL给它分配的内存大小。当MySQL创建一个新的连接线程时，需要给它分配一定大小的内存堆栈空间，以便存放客户端的请求的Query及自身的各种状态和处理信息。查看连接线程相关的系统变量的设置值 `show variables like 'thread%';`
+         7. binlog_cache_size：为每个 session 分配的内存，在事务过程中用来存储二进制日志的缓存。表示的是binlog 能够使用的最大cache 内存大小。在一个事务还没有 commit 之前会先将其日志存储于 binlog_cache 中，等到事务 commit 后会将其 binlog 刷回磁盘上的 binlog 文件以持久化。当我们执行多语句事务的时候 所有session的使用的内存超过max_binlog_cache_size的值时就会报错：“Multi-statement transaction required more than 'max_binlog_cache_size' bytes ofstorage”
+   3. 估算内存占用 <http://www.mysqlcalculator.com/>
+      1. key_buffer_size + query_cache_size + tmp_table_size + innodb_buffer_pool_size + innodb_additional_mem_pool_size + innodb_log_buffer_size + max_connections * (sort_buffer_size + read_buffer_size + read_rnd_buffer_size + join_buffer_size + thread_stack + binlog_cache_size)
 
 2. 检查监控模式是否启用
    1. 性能模式是否启用
@@ -81,9 +93,9 @@
    2. 查看内存事件摘要信息
       1. 按 EVENT_NAME(innodb%) 查询
       `SELECT * FROM performance_schema.memory_summary_global_by_event_name a WHERE EVENT_NAME LIKE 'memory/innodb/%' AND CURRENT_NUMBER_OF_BYTES_USED > 0 ORDER BY SUM_NUMBER_OF_BYTES_ALLOC DESC;`。
-      2. 按 USER、HOST 分组查询
+      1. 按 USER、HOST 分组查询
       `SELECT * FROM performance_schema.memory_summary_by_account_by_event_name a WHERE EVENT_NAME LIKE 'memory/innodb/%' AND CURRENT_NUMBER_OF_BYTES_USED > 0 ORDER BY CURRENT_NUMBER_OF_BYTES_USED DESC;`
-      3. 按 THREAD_ID 分组查询
+      1. 按 THREAD_ID 分组查询
       `SELECT * FROM performance_schema.memory_summary_by_thread_by_event_name a WHERE EVENT_NAME LIKE 'memory/innodb/%' AND CURRENT_NUMBER_OF_BYTES_USED > 0 ORDER BY CURRENT_NUMBER_OF_BYTES_USED DESC;`
    3. `SHOW STATUS LIKE 'Innodb_buffer%';`
    4. 检查innodb缓存池配置
@@ -129,7 +141,8 @@
          `SELECT * FROM performance_schema.memory_summary_by_thread_by_event_name WHERE EVENT_NAME LIKE 'memory/sql/TABLE%' AND SUM_NUMBER_OF_BYTES_ALLOC > 0 ORDER BY SUM_NUMBER_OF_BYTES_ALLOC DESC;`
 
 6. 监控进程列表
-   1. 查看进程列表 `SHOW FULL PROCESSLIST;`
+   1. 查看进程列表 `SHOW FULL PROCESSLIST;` 可估算为 session 数。
+      等效查询 `SELECT * FROM performance_schema.processlist`
    2. 处理State
       1. State - Sending to client
          若看到State长时间显示为“Sending to client”，说明服务端发送阻塞，服务器端的网络栈写满了；业务开发同学优化查询结果，并评估这么多的返回结果是否合理。
@@ -146,4 +159,12 @@
          服务器在此状态下采取的操作包括刷新二进制日志和InnoDB日志。
    3. 删除异常PROCESS `KILL [CONNECTION | QUERY] processlist_id`
 
-7. 运行一段时间后，将所有参数配置写入配置文件固化，并关闭非核心的监控功能。
+7. 查看线程表
+   1. `SELECT * FROM performance_schema.threads`
+      PROCESSLIST表的HOST列不同，PROCESSLIST_HOST列不包括TCP/IP连接的端口号。
+      1. 确认有否启用套接字检测工具 `SELECT NAME, ENABLED, TIMED FROM performance_schema.setup_instruments WHERE NAME LIKE 'wait/io/socket%';` 默认情况下未启用
+         1. 启用命令 `UPDATE performance_schema.setup_instruments SET ENABLED='YES' WHERE NAME LIKE 'wait/io/socket%';`
+         2. 检查 `SELECT * FROM performance_schema.socket_instances;`
+      2. MySQL 8.0.31 提供 CONTROLLED_MEMORY、MAX_CONTROLLED_MEMORY、TOTAL_MEMORY、MAX_TOTAL_MEMORY 内存占用数据。
+
+8. 运行一段时间后，将所有参数配置写入配置文件固化，并关闭非核心的监控功能。
