@@ -4,13 +4,14 @@
 
 1. 检查监控器是否启动 `SELECT @@innodb_status_output;`
    1. 启用 `SET GLOBAL innodb_status_output=ON;`
-2. 查看状态 `SHOW ENGINE INNODB STATUS`
+2. 查看状态 `SHOW ENGINE INNODB STATUS;`
    1. 信号等待: SEMAPHORES
       1. 若有大量线程等待信号量，可能是磁盘I/O或InnoDB内部争用问题的结果。
-      2. 进一步查看 `SHOW ENGINE INNODB MUTEX`
+      2. 进一步查看 `SHOW ENGINE INNODB MUTEX;`
          1. 检查InnoDB Mutex等待状况
             1. 是否启用 `SELECT * FROM performance_schema.setup_instruments WHERE NAME LIKE '%wait/synch/mutex/innodb%';`
-            2. 查看数据：事件名（EVENT_NAME）、等待次数（COUNT_STAR）、总等待时间（SUM_TIMER_wait）
+            2. 启用 `UPDATE performance_schema.setup_instruments SET ENABLED = 'YES' , TIMED = 'YES' WHERE NAME LIKE '%wait/synch/mutex/innodb%';`
+            3. 查看数据：事件名（EVENT_NAME）、等待次数（COUNT_STAR）、总等待时间（SUM_TIMER_wait）
 
                ```sql
                SELECT EVENT_NAME, COUNT_STAR, SUM_TIMER_WAIT/1000000000 SUM_TIMER_WAIT_MS
