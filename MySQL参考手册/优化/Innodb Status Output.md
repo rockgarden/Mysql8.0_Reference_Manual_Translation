@@ -31,39 +31,33 @@ mysql tables in use 1, locked 1
 LOCK WAIT 4 lock struct(s), heap size 1128, 2 row lock(s), undo log entries 1
 MySQL thread id 82089, OS thread handle 14792, query id 467582450 localhost 127.0.0.1 ecnt updating
 update lab_labour set
-		name = '李宇航',
-		idcard = null,
-		mobile = null,
-		sex_id = null,
-		birth_date = null,
-		education_id = null,
-		major = null,
-		graduate_school = null,
-		email = null,
-		idcard_date=null,
-		province =
-		'P0i2zTBOwJ6wWLmxkNMuSg==',
-		city = 'Lny+eg7w5eD4rJQCO7G4Gw==',
-		country = 'bAKJKcoo6uxQyygQqqtyuQ==',
-		street = 'I4yXMmxZ+2wXIoCrd+TAug==',
-		postal_code = null,
-		household_province =
-		'P0i2zTBOwJ6wWLmxkNMuSg==',
-		household_city = 'Lny+eg7w5eD4rJQCO7G4Gw==',
-		household_country = 'sMt2RAOAg0OYK3tPD/6ANg==',
-		household_street =
-		'EKvhUz5m5+TSu12rs/6GSRF2kYRkkXLDrPjKU9uVcNY=',
-		expected_salary = 3500.0,
-		working_life
-		= 3,
-		work_province = 'P0i2zTBOwJ6wWLmxkNMuSg==',
-		work_city =
-		'Lny+eg7w5eD4rJQCO7G4Gw==',
-		role_id = 3479,
-		entry_date = 99,
-		user_id =
-		54179
-		where id = 14998
+name = '李宇航',
+idcard = null,
+mobile = null,
+sex_id = null,
+birth_date = null,
+education_id = null,
+major = null,
+graduate_school = null,
+email = null,
+idcard_date=null,
+province = 'P0i2zTBOwJ6wWLmxkNMuSg==',
+city = 'Lny+eg7w5eD4rJQCO7G4Gw==',
+country = 'bAKJKcoo6uxQyygQqqtyuQ==',
+street = 'I4yXMmxZ+2wXIoCrd+TAug==',
+postal_code = null,
+household_province = 'P0i2zTBOwJ6wWLmxkNMuSg==',
+household_city = 'Lny+eg7w5eD4rJQCO7G4Gw==',
+household_country = 'sMt2RAOAg0OYK3tPD/6ANg==',
+household_street = 'EKvhUz5m5+TSu12rs/6GSRF2kYRkkXLDrPjKU9uVcNY=',
+expected_salary = 3500.0,
+working_life = 3,
+work_province = 'P0i2zTBOwJ6wWLmxkNMuSg==',
+work_city = 'Lny+eg7w5eD4rJQCO7G4Gw==',
+role_id = 3479,
+entry_date = 99,
+user_id =54179
+where id = 14998
 
 *** (1) HOLDS THE LOCK(S):
 RECORD LOCKS space id 1826 page no 266 n bits 80 index PRIMARY of table `ecnt`.`sys_user` trx id 25774544 lock_mode X locks rec but not gap
@@ -156,10 +150,10 @@ mysql tables in use 1, locked 1
 LOCK WAIT 560 lock struct(s), heap size 73848, 21360 row lock(s)
 MySQL thread id 81790, OS thread handle 15748, query id 467582446 localhost 127.0.0.1 ecnt updating
 update sys_user
-		set mobile = null
-		where
-		mobile
-		= '18893147674'
+set mobile = null
+where
+mobile
+= '18893147674'
 
 *** (2) HOLDS THE LOCK(S):
 RECORD LOCKS space id 4830 page no 502 n bits 96 index PRIMARY of table `ecnt`.`lab_labour` trx id 25774543 lock_mode X
