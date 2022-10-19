@@ -1,5 +1,7 @@
 # InnoDB锁定和事务模型
 
+<https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-transaction-model.html>
+
 15.7.1 InnoDB锁定
 15.7.2 InnoDB事务模型
 15.7.3 InnoDB中不同SQL语句设置的锁
