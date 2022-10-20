@@ -1,5 +1,7 @@
 # MySQL 性能模式
 
+<https://dev.mysql.com/doc/refman/8.0/en/performance-schema.html>
+
 目录
 
 27.1 性能模式快速入门
