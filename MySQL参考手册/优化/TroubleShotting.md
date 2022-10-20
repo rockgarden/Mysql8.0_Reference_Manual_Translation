@@ -30,12 +30,14 @@
 1. 查询系统内存分配状况
 
     ```sql
-    SELECT SUBSTRING_INDEX(event_name,'/',2) AS
-        code_area, FORMAT_BYTES(SUM(current_alloc))
-        AS current_alloc
-        FROM sys.x$memory_global_by_current_bytes
-        GROUP BY SUBSTRING_INDEX(event_name,'/',2)
-        ORDER BY SUM(current_alloc) DESC;
+   SELECT SUBSTRING_INDEX(event_name,'/',2) AS
+      code_area, FORMAT_BYTES(SUM(current_alloc))
+      AS current_alloc, FORMAT_BYTES(SUM(high_alloc))
+      AS high_alloc, FORMAT_BYTES(SUM(high_avg_alloc))
+      AS high_avg_alloc
+      FROM sys.x$memory_global_by_current_bytes
+      GROUP BY SUBSTRING_INDEX(event_name,'/',2)
+      ORDER BY SUM(current_alloc) DESC;
     ```
 
     结果示例：
@@ -77,8 +79,9 @@
 2. 检查监控模式是否启用
    1. 性能模式是否启用
       1. `SHOW VARIABLES LIKE 'performance_schema';`
+      2. 查看监控工具启用状况 `SELECT * from performance_schema.setup_instruments;`
          1. 全部监控工具启用命令（不建议）`UPDATE performance_schema.setup_instruments SET ENABLED = 'YES', TIMED = 'YES';`
-   2. 查看服务器目前正在执行的监控事务 `SELECT * FROM performance_schema.events_waits_current`，每个线程包含一行，显示每个线程最近监视的事件。
+   2. 查看服务器目前正在执行的监控事务 `SELECT * FROM performance_schema.events_waits_current;`，每个线程包含一行，显示每个线程最近监视的事件。
       1. 查询历史监控事务 `SELECT EVENT_ID, EVENT_NAME, TIMER_WAIT FROM performance_schema.events_waits_history_long ORDER BY EVENT_ID;`
    3. 查看内存监控工具是否启用 `SELECT * from performance_schema.setup_instruments WHERE NAME LIKE 'memory/%';`，输出所有 memory 相关 EVENT_NAME。
       1. 运行时启用命令: `UPDATE performance_schema.setup_instruments SET ENABLED = 'YES' WHERE NAME LIKE 'memory/%';`。
@@ -143,7 +146,8 @@
 
 6. 监控进程列表
    1. 查看进程列表 `SHOW FULL PROCESSLIST;` 可估算为 session 数。
-      等效查询 `SELECT * FROM performance_schema.processlist`
+      等效查询 `SELECT * FROM performance_schema.processlist;`
+      1. 通过 USER HOST 确认 当前用户 的 ID（process）
    2. 处理State
       1. State - Sending to client
          若看到State长时间显示为“Sending to client”，说明服务端发送阻塞，服务器端的网络栈写满了；业务开发同学优化查询结果，并评估这么多的返回结果是否合理。
@@ -161,7 +165,7 @@
    3. 删除异常PROCESS `KILL [CONNECTION | QUERY] processlist_id`
 
 7. 查看线程表
-   1. `SELECT * FROM performance_schema.threads`
+   1. `SELECT * FROM performance_schema.threads;`
       PROCESSLIST表的HOST列不同，PROCESSLIST_HOST列不包括TCP/IP连接的端口号。
       1. 确认有否启用套接字检测工具 `SELECT NAME, ENABLED, TIMED FROM performance_schema.setup_instruments WHERE NAME LIKE 'wait/io/socket%';` 默认情况下未启用
          1. 启用命令 `UPDATE performance_schema.setup_instruments SET ENABLED='YES' WHERE NAME LIKE 'wait/io/socket%';`
