@@ -2,11 +2,11 @@
 
 <https://dev.mysql.com/doc/refman/8.0/en/select-optimization.html>
 
-- 8.2.1.1 [WHERE 子句优化](WHERE子句优化.md)
+- 8.2.1.1 [WHERE子句优化](WHERE子句优化.md)
 - 8.2.1.2 [范围优化](范围优化.md)
 - 8.2.1.3 [索引合并优化](索引合并优化.md)
 - 8.2.1.4 [哈希连接优化](哈希连接优化.md)
-- 8.2.1.5 [NDB Engine条件下推优化](Engine条件下推优化.md)
+- 8.2.1.5 [NDB-Engine条件下推优化](Engine条件下推优化.md)
 - 8.2.1.6 索引条件下推优化
 8.2.1.7 嵌套循环连接算法
 - 8.2.1.8 [嵌套连接优化](嵌套连接优化.md)
@@ -34,9 +34,9 @@ NDB Cluster 支持连接下推优化，其中合格的连接被完整地发送�
 
 优化查询的主要考虑因素是：
 
-- 要使慢速 SELECT ... WHERE 查询更快，首先要检查的是是否可以添加[索引](https://dev.mysql.com/doc/refman/8.0/en/glossary.html#glos_index)。在 WHERE 子句中使用的列上设置索引，以加快评估、过滤和最终检索结果的速度。为避免浪费磁盘空间，请构建一小组索引来加速应用程序中使用的许多相关查询。
+- 要使慢速 SELECT ... WHERE 查询更快，首先要检查的是是否可以添加索引。在 WHERE 子句中使用的列上设置索引，以加快评估、过滤和最终检索结果的速度。为避免浪费磁盘空间，请构建一小组索引来加速应用程序中使用的许多相关查询。
 
-- 对于使用连接和外键等功能引用不同表的查询，索引尤其重要。您可以使用 EXPLAIN 语句来确定哪些索引用于 SELECT。请参阅第 [8.3.1 节，“MySQL 如何使用索引”](https://dev.mysql.com/doc/refman/8.0/en/mysql-indexes.html)和第 [8.8.1 节，“使用 EXPLAIN 优化查询”](https://dev.mysql.com/doc/refman/8.0/en/using-explain.html)。
+- 对于使用连接和外键等功能引用不同表的查询，索引尤其重要。您可以使用 EXPLAIN 语句来确定哪些索引用于 SELECT。请参阅第 [8.3.1 节，“MySQL 如何使用索引”](../../优化和索引/MySQL如何使用索引.md)和 [使用 EXPLAIN 优化查询](../../了解查询执行计划/使用EXPLAIN优化查询.md)。
 
 - 隔离和调整查询的任何部分，例如函数调用，这会花费过多时间。根据查询的结构，可以为结果集中的每一行调用一次函数，甚至为表中的每一行调用一次函数，这极大地放大了任何低效率。Isolate and tune any part of the query, such as a function call, that takes excessive time. Depending on how the query is structured, a function could be called once for every row in the result set, or even once for every row in the table, greatly magnifying any inefficiency.
 
