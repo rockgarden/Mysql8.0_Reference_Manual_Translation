@@ -8,20 +8,17 @@
 
 ## 优化内存使用
 
-- 8.12.3.1 MySQL如何使用内存
-- 8.12.3.2 启用大页面支持
-
 ### MySQL如何使用内存
 
 MySQL分配缓冲区和缓存以提高数据库操作的性能。默认配置旨在允许MySQL服务器在具有大约512MB RAM的虚拟机上启动。可以通过增加某些与缓存和缓冲区相关的系统变量的值来提高MySQL性能。您还可以修改默认配置，以便在内存有限的系统上运行MySQL。
 
 以下列表描述了MySQL使用内存的一些方式。适用时，参考相关系统变量。有些项目是特定于存储引擎或功能的。
 
-- InnoDB缓冲池是一个内存区域，用于保存表、索引和其他辅助缓冲区的缓存InnoDB数据。为了提高高容量读取操作的效率，缓冲池被划分为可能包含多行的页。为了提高缓存管理的效率，缓冲池被实现为页面的链接列表；使用LRU算法的变体，很少使用的数据从缓存中老化。有关更多信息，请参阅[缓冲池](../InnoDB存储引擎/InnoDB内存结构/缓冲池.md)。
+- InnoDB缓冲池是一个内存区域，用于保存表、索引和其他辅助缓冲区的缓存InnoDB数据。为了提高高容量读取操作的效率，缓冲池被划分为可能包含多行的页。为了提高缓存管理的效率，缓冲池被实现为页面的链接列表；使用[LRU](https://dev.mysql.com/doc/refman/8.0/en/glossary.html#glos_lru)算法的变体，很少使用的数据从缓存中老化。有关更多信息，请参阅[缓冲池](../InnoDB存储引擎/InnoDB内存结构/缓冲池.md)。
 
   缓冲池的大小对系统性能很重要：
 
-  - InnoDB在服务器启动时使用 malloc() 操作为整个缓冲池分配内存。 innodb_buffer_pool_size 系统变量定义缓冲池大小。通常，建议的innodb_buffer_pool_size值为系统内存的50%到75%。innodbbufferpoolsize可以在服务器运行时动态配置。有关更多信息，请参阅“配置InnoDB缓冲池大小”。
+  - InnoDB在服务器启动时使用 malloc() 操作为整个缓冲池分配内存。 innodb_buffer_pool_size 系统变量定义缓冲池大小。通常，建议的innodb_buffer_pool_size值为系统内存的50%到75%。innodb_buffer_pool_size 可以在服务器运行时动态配置。有关更多信息，请参阅“配置InnoDB缓冲池大小”。
 
   - 在具有大量内存的系统上，可以通过将缓冲池划分为多个缓冲池实例来提高并发性。 innodb_buffer_pool_instances 系统变量定义缓冲池实例的数量。
 
@@ -41,7 +38,7 @@ MySQL分配缓冲区和缓存以提高数据库操作的性能。默认配置旨
 
   对于用CREATE TABLE显式创建的MEMORY表，只有max_heap_table_size系统变量决定表可以增长多少，并且不转换为磁盘格式。
 
-- [MySQL Performance Schema](https://dev.mysql.com/doc/refman/8.0/en/performance-schema.html)是一种低级别监视MySQL服务器执行的功能。Performance Schema以增量方式动态分配内存，将其内存使用扩展到实际的服务器负载，而不是在服务器启动期间分配所需的内存。**一旦分配了内存，只有重新启动服务器才能释放内存**。有关更多信息，请参阅第27.17节“[性能模式内存分配模型](https://dev.mysql.com/doc/refman/8.0/en/performance-schema-memory-model.html)”。
+- [MySQL Performance Schema](../MySQL性能模式/MySQL性能模式.md)是一种低级别监视MySQL服务器执行的功能。Performance Schema以增量方式动态分配内存，将其内存使用扩展到实际的服务器负载，而不是在服务器启动期间分配所需的内存。**一旦分配了内存，只有重新启动服务器才能释放内存**。有关更多信息，请参阅第27.17节“[性能模式内存分配模型](https://dev.mysql.com/doc/refman/8.0/en/performance-schema-memory-model.html)”。
 
 - 服务器用于管理客户端连接的每个线程都需要一些特定于线程的空间。下表列出了这些变量以及哪些系统变量控制它们的大小：
 
@@ -79,7 +76,7 @@ MySQL分配缓冲区和缓存以提高数据库操作的性能。默认配置旨
 
 - MySQL还需要用于表定义缓存的内存。[table_definition_cache](https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_table_definition_cache)系统变量定义可以存储在表定义缓存中的表定义数。如果使用大量表，可以创建大型表定义缓存以加快表的打开速度。与表缓存不同，表定义缓存占用的空间更少，并且不使用文件描述符。
 
-- FLUSHTABLES语句或mysqladmin FLUSH-TABLES命令将关闭所有未立即使用的表，并在当前执行线程结束时将所有正在使用的表标记为关闭。这有效地释放了大部分在用内存。在关闭所有表之前，FLUSH TABLES不会返回。
+- FLUSH TABLES语句或mysqladmin FLUSH-TABLES命令将关闭所有未立即使用的表，并在当前执行线程结束时将所有正在使用的表标记为关闭。这有效地释放了大部分在用内存。在关闭所有表之前，FLUSH TABLES不会返回。
 
 - 作为GRANT, CREATE USER, CREATE SERVER 和 INSTALL PLUGIN语句的结果，服务器将信息缓存在内存中。此内存不是由相应的[REVOKE](https://dev.mysql.com/doc/refman/8.0/en/revoke.html)、[DROP USER](https://dev.mysql.com/doc/refman/8.0/en/drop-user.html)、[DROP SERVER](https://dev.mysql.com/doc/refman/8.0/en/drop-server.html)和[UNINSTALL PLUGIN](https://dev.mysql.com/doc/refman/8.0/en/uninstall-plugin.html)语句释放的，因此，对于执行许多导致缓存的语句实例的服务器，缓存内存使用量会增加，除非使用[FLUSH PRIVILEGES](https://dev.mysql.com/doc/refman/8.0/en/flush.html#flush-privileges)释放它。
 
@@ -101,7 +98,7 @@ ps和其他系统状态程序可能会报告mysqld使用了大量内存。这可
 
 ### 监视MySQL内存使用情况
 
-下面的示例演示如何使用[性能模式](https://dev.mysql.com/doc/refman/8.0/en/performance-schema.html)和[系统模式](https://dev.mysql.com/doc/refman/8.0/en/sys-schema.html)来监视MySQL内存使用情况。
+下面的示例演示如何使用性能模式(performance-schema)和[系统模式](https://dev.mysql.com/doc/refman/8.0/en/sys-schema.html)来监视MySQL内存使用情况。
 
 默认情况下，大多数性能模式内存检测都处于禁用状态。可以通过更新Performance Schema [setup_Instruments](https://dev.mysql.com/doc/refman/8.0/en/performance-schema-setup-instruments-table.html)表的enabled列来启用仪器。内存工具的名称格式为`memory/code_area/instrument_name`，其中code_area是一个值，如sql或innodb，instrument_nam是仪器详细信息。
 
