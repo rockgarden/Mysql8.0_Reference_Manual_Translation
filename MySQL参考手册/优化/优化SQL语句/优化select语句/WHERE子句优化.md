@@ -28,7 +28,7 @@
   -≫ SELECT * FROM t WHERE 1;
   ```
 
-  有关详细信息，请参阅第 8.2.1.14 节，“[恒定折叠优化](https://dev.mysql.com/doc/refman/8.0/en/constant-folding-optimization.html)”。
+  有关详细信息，请参阅 “[恒定折叠优化](Constant-Folding优化.md)”。
 
 - 没有 WHERE 的单个表上的 COUNT(*) 直接从 MyISAM 和 MEMORY 表的表信息中检索。当仅与一个表一起使用时，这也适用于任何 NOT NULL 表达式。
 
