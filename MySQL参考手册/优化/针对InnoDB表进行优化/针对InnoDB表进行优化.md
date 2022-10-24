@@ -7,10 +7,10 @@
 - 8.5.3 [优化InnoDB只读事务](#优化innodb只读事务)
 - 8.5.4 [优化InnoDB重做日志](#优化innodb重做日志)
 - 8.5.5 [InnoDB表的批量数据加载](#innodb表的批量数据加载)
-- 8.5.6 [优化InnoDB查询](#优化-innodb-查询)
-- 8.5.7 优化InnoDB DDL 操作
-- 8.5.8 优化 InnoDB 磁盘 I/O
-- 8.5.9 优化 InnoDB 配置变量
+- 8.5.6 [优化InnoDB查询](#优化innodb查询)
+- 8.5.7 [优化InnoDB DDL操作](#优化innodb-ddl操作)
+- 8.5.8 优化InnoDB磁盘I/O
+- 8.5.9 [优化InnoDB配置变量](优化InnoDB配置变量.md)
 - 8.5.10 [为具有许多表的系统优化InnoDB](#针对多表系统优化innodb)
 
 InnoDB 是 MySQL 客户通常在可靠性和并发性很重要的生产数据库中使用的存储引擎。 InnoDB 是 MySQL 中的默认存储引擎。 本节介绍如何优化 InnoDB 表的数据库操作。
@@ -190,7 +190,7 @@ InnoDB 在以下情况下检测只读事务：
 
 使用 MySQL Shell 导入数据。 MySQL Shell 的并行表导入实用程序 util.importTable() 为大型数据文件提供到 MySQL 关系表的快速数据导入。 MySQL Shell 的转储加载实用程序 util.loadDump() 还提供并行加载功能。请参阅 [MySQL Shell 实用程序](https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-utilities.html)。
 
-## 优化 InnoDB 查询
+## 优化InnoDB查询
 
 要调整 InnoDB 表的查询，请在每个表上创建一组适当的索引。有关详细信息，请参阅 [MySQL 如何使用索引](../优化和索引/MySQL如何使用索引.md)。遵循 InnoDB 索引的这些准则：
 
@@ -203,7 +203,17 @@ InnoDB 在以下情况下检测只读事务：
 
 - 如果索引列不能包含任何 NULL 值，请在创建表时将其声明为 NOT NULL。当优化器知道每列是否包含 NULL 值时，它可以更好地确定哪个索引对查询最有效。
 
-- 您可以使用 [优化 InnoDB 只读事务](#优化-innodb-只读事务) 中的技术来优化 InnoDB 表的单查询事务。
+- 您可以使用 优化InnoDB只读事务 中的技术来优化 InnoDB 表的单查询事务。
+
+## 优化InnoDB DDL操作
+
+对表和索引（CREATE、ALTER和DROP语句）的许多DDL操作都可以在线执行。详见第15.12节“[InnoDB和在线DDL](https://dev.mysql.com/doc/refman/8.0/en/innodb-online-ddl.html)”。
+
+对添加辅助索引的在线DDL支持意味着您通常可以通过创建没有辅助索引的表，然后在加载数据后添加辅助索引，来加快创建和加载表及相关索引的过程。
+
+使用TRUNCATE TABLE清空表，而不是DELETE FROM tbl_name。外键约束可以使TRUNCATE语句像常规DELETE语句一样工作，在这种情况下，DROP TABLE和CREATE TABLE等命令序列可能最快。
+
+因为主键对于每个InnoDB表的存储布局是不可或缺的，并且更改主键的定义涉及到重新组织整个表，所以始终将主键设置为CREATE TABLE语句的一部分，并提前计划，这样以后就不需要ALTER或DROP主键。
 
 ## 针对多表系统优化InnoDB
 
