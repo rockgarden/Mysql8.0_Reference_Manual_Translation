@@ -9,7 +9,7 @@
 - 8.5.5 [InnoDB表的批量数据加载](#innodb表的批量数据加载)
 - 8.5.6 [优化InnoDB查询](#优化innodb查询)
 - 8.5.7 [优化InnoDB DDL操作](#优化innodb-ddl操作)
-- 8.5.8 优化InnoDB磁盘I/O
+- 8.5.8 [优化InnoDB磁盘I/O](优化InnoDB磁盘IO.md)
 - 8.5.9 [优化InnoDB配置变量](优化InnoDB配置变量.md)
 - 8.5.10 [为具有许多表的系统优化InnoDB](#针对多表系统优化innodb)
 
