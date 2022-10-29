@@ -246,4 +246,3 @@ MySQL没有任何类型Array或List，所以我们需要找到一种解决方法
         EXECUTE stmt;
     END; 
     ```
-
