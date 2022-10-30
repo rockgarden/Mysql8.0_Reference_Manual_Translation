@@ -237,7 +237,7 @@
       3. 临时处理： 对 DERIVED表 强制分组或去重 优化器将创建 index
          `SELECT department_id, poNumber FROM polist_huawei GROUP BY poNumber`
 
-> 派生表的具体化适用于公用表表达式 (common table expressions, CTE)。此外，以下注意事项特别适用于 CTE。
+> 派生表的具体化适用于公用表表达式 (CTE)。此外，以下注意事项特别适用于 CTE。
 如果 CTE 由查询具体化，则它会为查询具体化一次，即使查询多次引用它也是如此。
 递归 CTE 总是物化的。
 如果 CTE 被具体化，如果优化器估计索引可以加快顶层语句对 CTE 的访问，则它会自动添加相关索引。这类似于派生表的自动索引，只是如果 CTE 被多次引用，优化器可能会创建多个索引，以便以最合适的方式加速每个引用的访问。
