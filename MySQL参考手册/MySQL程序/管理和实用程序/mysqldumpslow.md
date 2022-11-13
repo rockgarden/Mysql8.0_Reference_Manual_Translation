@@ -1,6 +1,6 @@
 # mysqldumpslow — 总结慢查询日志文件
 
-MySQL 慢查询日志包含有关需要很长时间执行的查询的信息（“[慢查询日志](https://dev.mysql.com/doc/refman/8.0/en/slow-query-log.html)”）。 mysqldumpslow 解析 MySQL 慢查询日志文件并总结它们的内容。
+MySQL 慢查询日志包含有关需要很长时间执行的查询的信息。 mysqldumpslow 解析 MySQL 慢查询日志文件并总结它们的内容。
 
 通常，mysqldumpslow 对除了数字和字符串数据值的特定值之外相似的查询进行分组。 在显示摘要输出时，它将这些值“抽象”为 N 和“S”。 要修改值抽象行为，请使用 -a 和 -n 选项。
 
@@ -81,3 +81,20 @@ mysqldumpslow 支持以下选项。
  --verbose，-v
 
 详细模式。打印有关程序功能的更多信息。
+
+## 示例
+
+```sql
+mysqldumpslow -s c -t 10 /Users/wangkan/Downloads/iZlaziez40x2rhZ-slow.log
+-- 取出使用最多的10条慢查
+
+mysqldumpslow -s t -t 10 -v /Users/wangkan/Downloads/iZlaziez40x2rhZ-slow.log
+-- 取出查询时间最慢的10条慢查询
+
+mysqldumpslow -s t -t 10 -g “left join” /database/mysql/slow-log
+-- 得到按照时间排序的前10条里面含有左连接的查询语句
+
+mysqldumpslow -s r -t 10 -g 'left join' /var/run/mysqld/mysqld-slow.log
+--  按照扫描行数最多的
+
+```

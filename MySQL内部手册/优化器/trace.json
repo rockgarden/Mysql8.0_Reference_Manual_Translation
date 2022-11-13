@@ -1,0 +1,2924 @@
+{
+  "steps": [
+    {
+      "join_preparation": {
+        "select#": 1,
+        "steps": [
+          {
+            "join_preparation": {
+              "select#": 2,
+              "steps": [
+                {
+                  "expanded_query": "/* select#2 */ select `a1`.`pom_id` AS `pom_id`,group_concat(`b1`.`contract_no` separator ',') AS `contract_no`,group_concat(`c1`.`project_no` separator ',') AS `project_no` from ((`pom_follow_huawei_bind` `a1` join `conm_contract` `b1`) join `pro_project` `c1`) where ((`a1`.`contractid` = `b1`.`id`) and (`a1`.`projectid` = `c1`.`id`)) group by `a1`.`pom_id`"
+                }
+              ]
+            }
+          },
+          {
+            "derived": {
+              "table": " `c`",
+              "select#": 2,
+              "materialized": true
+            }
+          },
+          {
+            "join_preparation": {
+              "select#": 3,
+              "steps": [
+                {
+                  "join_preparation": {
+                    "select#": 4,
+                    "steps": [
+                      {
+                        "expanded_query": "/* select#4 */ select `b9`.`pom_id` AS `pom_id`,group_concat(distinct `a9`.`bill_date` separator ',') AS `invoice_date`,group_concat(distinct `a9`.`bill_name` separator ',') AS `bill_name` from (`icm_bill` `a9` join `icm_des_pom_done` `b9`) where (`a9`.`des_id` = `b9`.`des_id`) group by `b9`.`pom_id`"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "derived": {
+                    "table": " `invoice_bind`",
+                    "select#": 4,
+                    "materialized": true
+                  }
+                },
+                {
+                  "expanded_query": "/* select#3 */ select `a2`.`pom_id_real` AS `pom_id`,group_concat(`b2`.`contract_no` separator ',') AS `contract_no_in`,group_concat(`c2`.`project_no` separator ',') AS `project_no_in`,group_concat(concat(round(`a2`.`counts`,4),'归入',convert(date_format(`invoice_bind`.`invoice_date`,'%Y-%m-%d') using utf8mb4)) separator ',') AS `invoice_date`,group_concat(distinct `invoice_bind`.`bill_name` separator ',') AS `bill_name`,sum(`a2`.`counts`) AS `invoiceamount` from (((`pom_order_huawei_bind` `a2` join `conm_contract` `b2`) join `pro_project` `c2`) left join (/* select#4 */ select `b9`.`pom_id` AS `pom_id`,group_concat(distinct `a9`.`bill_date` separator ',') AS `invoice_date`,group_concat(distinct `a9`.`bill_name` separator ',') AS `bill_name` from (`icm_bill` `a9` join `icm_des_pom_done` `b9`) where (`a9`.`des_id` = `b9`.`des_id`) group by `b9`.`pom_id`) `invoice_bind` on((`a2`.`pom_id` = `invoice_bind`.`pom_id`))) where ((`a2`.`contractid` = `b2`.`id`) and (`a2`.`projectid` = `c2`.`id`)) group by `a2`.`pom_id_real`"
+                }
+              ]
+            }
+          },
+          {
+            "derived": {
+              "table": " `y`",
+              "select#": 3,
+              "materialized": true
+            }
+          },
+          {
+            "join_preparation": {
+              "select#": 5,
+              "steps": [
+                {
+                  "expanded_query": "/* select#5 */ select max(`conm_contract`.`id`) AS `contractid`,`conm_contract`.`contract_no_other` AS `contract_no_other`,max(`conm_contract`.`contract_no`) AS `contract_no` from `conm_contract` where (`conm_contract`.`contract_no_other` <> '') group by `conm_contract`.`contract_no_other`"
+                }
+              ]
+            }
+          },
+          {
+            "derived": {
+              "table": " `z`",
+              "select#": 5,
+              "materialized": true
+            }
+          },
+          {
+            "expanded_query": "/* select#1 */ select `polist_huawei`.`poNumber` AS `poNumber`,`polist_huawei`.`poLineNum` AS `poLineNum`,`polist_huawei`.`startDate` AS `startDate`,date_format(`polist_huawei`.`promiseDate`,'%Y/%m/%d') AS `lastUpdateDate`,`polist_huawei`.`repOfficeName` AS `repOfficeName`,`polist_huawei`.`deptCode` AS `deptCode`,`polist_huawei`.`engInfoCentralZone` AS `engInfoCentralZone`,`polist_huawei`.`engInfoEngineeringName` AS `projectInfo`,`polist_huawei`.`itemDescription` AS `itemDescription`,`polist_huawei`.`quantity` AS `quantity`,`polist_huawei`.`priceOverride` AS `priceOverride`,`polist_huawei`.`taxRate` AS `taxRate`,round(`y`.`invoiceamount`,4) AS `sale_count`,round((`y`.`invoiceamount` - ifnull(`g`.`get_count`,0)),4) AS `curr_count`,`g`.`get_date` AS `get_date`,`g`.`get_count` AS `get_count`,`z`.`contractid` AS `contractid`,(case when (`c`.`contract_no` is null) then `z`.`contract_no` else `c`.`contract_no` end) AS `contract_no`,`c`.`project_no` AS `project_no`,`y`.`contract_no_in` AS `contract_no_in`,`y`.`project_no_in` AS `project_no_in`,`polist_huawei`.`lineLocationId` AS `lineLocationId`,`polist_huawei`.`department_id` AS `department_id`,(case when ((`y`.`invoiceamount` > 0) and (round((`y`.`invoiceamount` - ifnull(`g`.`get_count`,0)),4) <= 0)) then 2 else `polist_huawei`.`postate` end) AS `postate`,`sys_department`.`text` AS `text`,`y`.`invoice_date` AS `invoicetime`,`y`.`bill_name` AS `bill_name`,round((round(((`polist_huawei`.`quantity` * `polist_huawei`.`priceOverride`) * (1 + `polist_huawei`.`taxRate`)),4) - ifnull(`y`.`invoiceamount`,0)),4) AS `noinvoice_count`,round(((`polist_huawei`.`quantity` * `polist_huawei`.`priceOverride`) * (1 + `polist_huawei`.`taxRate`)),4) AS `total_count`,round(((`polist_huawei`.`quantity` * `polist_huawei`.`priceOverride`) * `polist_huawei`.`taxRate`),4) AS `tax_count`,`polist_huawei`.`publishDate` AS `collectdate`,`polist_huawei`.`shipmentStatus` AS `postatus1`,`polist_huawei`.`engInfo` AS `engInfo`,`polist_huawei`.`publishDate` AS `publishDate`,`polist_huawei`.`orgName` AS `orgName`,`polist_huawei`.`quantityUnaccepted` AS `quantityUnaccepted` from (((((`polist_huawei` left join (/* select#2 */ select `a1`.`pom_id` AS `pom_id`,group_concat(`b1`.`contract_no` separator ',') AS `contract_no`,group_concat(`c1`.`project_no` separator ',') AS `project_no` from ((`pom_follow_huawei_bind` `a1` join `conm_contract` `b1`) join `pro_project` `c1`) where ((`a1`.`contractid` = `b1`.`id`) and (`a1`.`projectid` = `c1`.`id`)) group by `a1`.`pom_id`) `c` on((`polist_huawei`.`lineLocationId` = `c`.`pom_id`))) left join `sys_department` on((`polist_huawei`.`department_id` = `sys_department`.`id`))) left join `v_icm_pom_get_table` `g` on((`polist_huawei`.`lineLocationId` = `g`.`pom_id_real`))) left join (/* select#3 */ select `a2`.`pom_id_real` AS `pom_id`,group_concat(`b2`.`contract_no` separator ',') AS `contract_no_in`,group_concat(`c2`.`project_no` separator ',') AS `project_no_in`,group_concat(concat(round(`a2`.`counts`,4),'归入',convert(date_format(`invoice_bind`.`invoice_date`,'%Y-%m-%d') using utf8mb4)) separator ',') AS `invoice_date`,group_concat(distinct `invoice_bind`.`bill_name` separator ',') AS `bill_name`,sum(`a2`.`counts`) AS `invoiceamount` from (((`pom_order_huawei_bind` `a2` join `conm_contract` `b2`) join `pro_project` `c2`) left join (/* select#4 */ select `b9`.`pom_id` AS `pom_id`,group_concat(distinct `a9`.`bill_date` separator ',') AS `invoice_date`,group_concat(distinct `a9`.`bill_name` separator ',') AS `bill_name` from (`icm_bill` `a9` join `icm_des_pom_done` `b9`) where (`a9`.`des_id` = `b9`.`des_id`) group by `b9`.`pom_id`) `invoice_bind` on((`a2`.`pom_id` = `invoice_bind`.`pom_id`))) where ((`a2`.`contractid` = `b2`.`id`) and (`a2`.`projectid` = `c2`.`id`)) group by `a2`.`pom_id_real`) `y` on((`polist_huawei`.`lineLocationId` = `y`.`pom_id`))) left join (/* select#5 */ select max(`conm_contract`.`id`) AS `contractid`,`conm_contract`.`contract_no_other` AS `contract_no_other`,max(`conm_contract`.`contract_no`) AS `contract_no` from `conm_contract` where (`conm_contract`.`contract_no_other` <> '') group by `conm_contract`.`contract_no_other`) `z` on((substr(`polist_huawei`.`subcontractNo`,1,32) = `z`.`contract_no_other`))) limit 1"
+          },
+          {
+            "transformations_to_nested_joins": {
+              "transformations": ["parenthesis_removal"],
+              "expanded_query": "/* select#4 */ select `b9`.`pom_id` AS `pom_id`,group_concat(distinct `a9`.`bill_date` separator ',') AS `invoice_date`,group_concat(distinct `a9`.`bill_name` separator ',') AS `bill_name` from `icm_bill` `a9` join `icm_des_pom_done` `b9` where (`a9`.`des_id` = `b9`.`des_id`) group by `b9`.`pom_id`"
+            }
+          },
+          {
+            "transformations_to_nested_joins": {
+              "transformations": ["parenthesis_removal"],
+              "expanded_query": "/* select#3 */ select `a2`.`pom_id_real` AS `pom_id`,group_concat(`b2`.`contract_no` separator ',') AS `contract_no_in`,group_concat(`c2`.`project_no` separator ',') AS `project_no_in`,group_concat(concat(round(`a2`.`counts`,4),'归入',convert(date_format(`invoice_bind`.`invoice_date`,'%Y-%m-%d') using utf8mb4)) separator ',') AS `invoice_date`,group_concat(distinct `invoice_bind`.`bill_name` separator ',') AS `bill_name`,sum(`a2`.`counts`) AS `invoiceamount` from `pom_order_huawei_bind` `a2` join `conm_contract` `b2` join `pro_project` `c2` left join (/* select#4 */ select `b9`.`pom_id` AS `pom_id`,group_concat(distinct `a9`.`bill_date` separator ',') AS `invoice_date`,group_concat(distinct `a9`.`bill_name` separator ',') AS `bill_name` from `icm_bill` `a9` join `icm_des_pom_done` `b9` where (`a9`.`des_id` = `b9`.`des_id`) group by `b9`.`pom_id`) `invoice_bind` on((`a2`.`pom_id` = `invoice_bind`.`pom_id`)) where ((`a2`.`contractid` = `b2`.`id`) and (`a2`.`projectid` = `c2`.`id`)) group by `a2`.`pom_id_real`"
+            }
+          },
+          {
+            "transformations_to_nested_joins": {
+              "transformations": ["parenthesis_removal"],
+              "expanded_query": "/* select#2 */ select `a1`.`pom_id` AS `pom_id`,group_concat(`b1`.`contract_no` separator ',') AS `contract_no`,group_concat(`c1`.`project_no` separator ',') AS `project_no` from `pom_follow_huawei_bind` `a1` join `conm_contract` `b1` join `pro_project` `c1` where ((`a1`.`contractid` = `b1`.`id`) and (`a1`.`projectid` = `c1`.`id`)) group by `a1`.`pom_id`"
+            }
+          },
+          {
+            "transformations_to_nested_joins": {
+              "transformations": ["parenthesis_removal"],
+              "expanded_query": "/* select#1 */ select `polist_huawei`.`poNumber` AS `poNumber`,`polist_huawei`.`poLineNum` AS `poLineNum`,`polist_huawei`.`startDate` AS `startDate`,date_format(`polist_huawei`.`promiseDate`,'%Y/%m/%d') AS `lastUpdateDate`,`polist_huawei`.`repOfficeName` AS `repOfficeName`,`polist_huawei`.`deptCode` AS `deptCode`,`polist_huawei`.`engInfoCentralZone` AS `engInfoCentralZone`,`polist_huawei`.`engInfoEngineeringName` AS `projectInfo`,`polist_huawei`.`itemDescription` AS `itemDescription`,`polist_huawei`.`quantity` AS `quantity`,`polist_huawei`.`priceOverride` AS `priceOverride`,`polist_huawei`.`taxRate` AS `taxRate`,round(`y`.`invoiceamount`,4) AS `sale_count`,round((`y`.`invoiceamount` - ifnull(`g`.`get_count`,0)),4) AS `curr_count`,`g`.`get_date` AS `get_date`,`g`.`get_count` AS `get_count`,`z`.`contractid` AS `contractid`,(case when (`c`.`contract_no` is null) then `z`.`contract_no` else `c`.`contract_no` end) AS `contract_no`,`c`.`project_no` AS `project_no`,`y`.`contract_no_in` AS `contract_no_in`,`y`.`project_no_in` AS `project_no_in`,`polist_huawei`.`lineLocationId` AS `lineLocationId`,`polist_huawei`.`department_id` AS `department_id`,(case when ((`y`.`invoiceamount` > 0) and (round((`y`.`invoiceamount` - ifnull(`g`.`get_count`,0)),4) <= 0)) then 2 else `polist_huawei`.`postate` end) AS `postate`,`sys_department`.`text` AS `text`,`y`.`invoice_date` AS `invoicetime`,`y`.`bill_name` AS `bill_name`,round((round(((`polist_huawei`.`quantity` * `polist_huawei`.`priceOverride`) * (1 + `polist_huawei`.`taxRate`)),4) - ifnull(`y`.`invoiceamount`,0)),4) AS `noinvoice_count`,round(((`polist_huawei`.`quantity` * `polist_huawei`.`priceOverride`) * (1 + `polist_huawei`.`taxRate`)),4) AS `total_count`,round(((`polist_huawei`.`quantity` * `polist_huawei`.`priceOverride`) * `polist_huawei`.`taxRate`),4) AS `tax_count`,`polist_huawei`.`publishDate` AS `collectdate`,`polist_huawei`.`shipmentStatus` AS `postatus1`,`polist_huawei`.`engInfo` AS `engInfo`,`polist_huawei`.`publishDate` AS `publishDate`,`polist_huawei`.`orgName` AS `orgName`,`polist_huawei`.`quantityUnaccepted` AS `quantityUnaccepted` from `polist_huawei` left join (/* select#2 */ select `a1`.`pom_id` AS `pom_id`,group_concat(`b1`.`contract_no` separator ',') AS `contract_no`,group_concat(`c1`.`project_no` separator ',') AS `project_no` from `pom_follow_huawei_bind` `a1` join `conm_contract` `b1` join `pro_project` `c1` where ((`a1`.`contractid` = `b1`.`id`) and (`a1`.`projectid` = `c1`.`id`)) group by `a1`.`pom_id`) `c` on((`polist_huawei`.`lineLocationId` = `c`.`pom_id`)) left join `sys_department` on((`polist_huawei`.`department_id` = `sys_department`.`id`)) left join `v_icm_pom_get_table` `g` on((`polist_huawei`.`lineLocationId` = `g`.`pom_id_real`)) left join (/* select#3 */ select `a2`.`pom_id_real` AS `pom_id`,group_concat(`b2`.`contract_no` separator ',') AS `contract_no_in`,group_concat(`c2`.`project_no` separator ',') AS `project_no_in`,group_concat(concat(round(`a2`.`counts`,4),'归入',convert(date_format(`invoice_bind`.`invoice_date`,'%Y-%m-%d') using utf8mb4)) separator ',') AS `invoice_date`,group_concat(distinct `invoice_bind`.`bill_name` separator ',') AS `bill_name`,sum(`a2`.`counts`) AS `invoiceamount` from `pom_order_huawei_bind` `a2` join `conm_contract` `b2` join `pro_project` `c2` left join (/* select#4 */ select `b9`.`pom_id` AS `pom_id`,group_concat(distinct `a9`.`bill_date` separator ',') AS `invoice_date`,group_concat(distinct `a9`.`bill_name` separator ',') AS `bill_name` from `icm_bill` `a9` join `icm_des_pom_done` `b9` where (`a9`.`des_id` = `b9`.`des_id`) group by `b9`.`pom_id`) `invoice_bind` on((`a2`.`pom_id` = `invoice_bind`.`pom_id`)) where ((`a2`.`contractid` = `b2`.`id`) and (`a2`.`projectid` = `c2`.`id`)) group by `a2`.`pom_id_real`) `y` on((`polist_huawei`.`lineLocationId` = `y`.`pom_id`)) left join (/* select#5 */ select max(`conm_contract`.`id`) AS `contractid`,`conm_contract`.`contract_no_other` AS `contract_no_other`,max(`conm_contract`.`contract_no`) AS `contract_no` from `conm_contract` where (`conm_contract`.`contract_no_other` <> '') group by `conm_contract`.`contract_no_other`) `z` on((substr(`polist_huawei`.`subcontractNo`,1,32) = `z`.`contract_no_other`)) limit 1"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 1,
+        "steps": [
+          {
+            "join_optimization": {
+              "select#": 2,
+              "steps": [
+                {
+                  "condition_processing": {
+                    "condition": "WHERE",
+                    "original_condition": "((`a1`.`contractid` = `b1`.`id`) and (`a1`.`projectid` = `c1`.`id`))",
+                    "steps": [
+                      {
+                        "transformation": "equality_propagation",
+                        "resulting_condition": "(multiple equal(`a1`.`contractid`, `b1`.`id`) and multiple equal(`a1`.`projectid`, `c1`.`id`))"
+                      },
+                      {
+                        "transformation": "constant_propagation",
+                        "resulting_condition": "(multiple equal(`a1`.`contractid`, `b1`.`id`) and multiple equal(`a1`.`projectid`, `c1`.`id`))"
+                      },
+                      {
+                        "transformation": "trivial_condition_removal",
+                        "resulting_condition": "(multiple equal(`a1`.`contractid`, `b1`.`id`) and multiple equal(`a1`.`projectid`, `c1`.`id`))"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "substitute_generated_columns": {}
+                },
+                {
+                  "table_dependencies": [
+                    {
+                      "table": "`pom_follow_huawei_bind` `a1`",
+                      "row_may_be_null": false,
+                      "map_bit": 0,
+                      "depends_on_map_bits": []
+                    },
+                    {
+                      "table": "`conm_contract` `b1`",
+                      "row_may_be_null": false,
+                      "map_bit": 1,
+                      "depends_on_map_bits": []
+                    },
+                    {
+                      "table": "`pro_project` `c1`",
+                      "row_may_be_null": false,
+                      "map_bit": 2,
+                      "depends_on_map_bits": []
+                    }
+                  ]
+                },
+                {
+                  "ref_optimizer_key_uses": [
+                    {
+                      "table": "`conm_contract` `b1`",
+                      "field": "id",
+                      "equals": "`a1`.`contractid`",
+                      "null_rejecting": true
+                    },
+                    {
+                      "table": "`pro_project` `c1`",
+                      "field": "id",
+                      "equals": "`a1`.`projectid`",
+                      "null_rejecting": true
+                    }
+                  ]
+                },
+                {
+                  "rows_estimation": [
+                    {
+                      "table": "`pom_follow_huawei_bind` `a1`",
+                      "const_keys_added": {
+                        "keys": ["PRIMARY", "bindindex1"],
+                        "cause": "group_by"
+                      },
+                      "range_analysis": {
+                        "table_scan": {
+                          "rows": 389,
+                          "cost": 42.875
+                        },
+                        "potential_range_indexes": [
+                          {
+                            "index": "PRIMARY",
+                            "usable": true,
+                            "key_parts": ["id", "pom_id"]
+                          },
+                          {
+                            "index": "bindindex1",
+                            "usable": true,
+                            "key_parts": ["pom_id", "contractid", "projectid"]
+                          }
+                        ],
+                        "best_covering_index_scan": {
+                          "index": "bindindex1",
+                          "cost": 55.3167,
+                          "chosen": false,
+                          "cause": "cost"
+                        },
+                        "setup_range_conditions": [],
+                        "group_index_range": {
+                          "chosen": false,
+                          "cause": "not_single_table"
+                        },
+                        "skip_scan_range": {
+                          "chosen": false,
+                          "cause": "not_single_table"
+                        }
+                      }
+                    },
+                    {
+                      "table": "`conm_contract` `b1`",
+                      "table_scan": {
+                        "rows": 12649,
+                        "cost": 104.25
+                      }
+                    },
+                    {
+                      "table": "`pro_project` `c1`",
+                      "table_scan": {
+                        "rows": 1473,
+                        "cost": 5.5
+                      }
+                    }
+                  ]
+                },
+                {
+                  "considered_execution_plans": [
+                    {
+                      "plan_prefix": [],
+                      "table": "`pom_follow_huawei_bind` `a1`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "rows_to_scan": 389,
+                            "filtering_effect": [],
+                            "final_filtering_effect": 1,
+                            "access_type": "scan",
+                            "resulting_rows": 389,
+                            "cost": 40.775,
+                            "chosen": true,
+                            "use_tmp_table": true
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 389,
+                      "cost_for_plan": 40.775,
+                      "rest_of_plan": [
+                        {
+                          "plan_prefix": ["`pom_follow_huawei_bind` `a1`"],
+                          "table": "`pro_project` `c1`",
+                          "best_access_path": {
+                            "considered_access_paths": [
+                              {
+                                "access_type": "eq_ref",
+                                "index": "PRIMARY",
+                                "rows": 1,
+                                "cost": 136.15,
+                                "chosen": true,
+                                "cause": "clustered_pk_chosen_by_heuristics"
+                              },
+                              {
+                                "rows_to_scan": 1473,
+                                "filtering_effect": [],
+                                "final_filtering_effect": 1,
+                                "access_type": "scan",
+                                "using_join_cache": true,
+                                "buffers_needed": 2,
+                                "resulting_rows": 1473,
+                                "cost": 57311.5,
+                                "chosen": false
+                              }
+                            ]
+                          },
+                          "condition_filtering_pct": 100,
+                          "rows_for_plan": 389,
+                          "cost_for_plan": 176.925,
+                          "rest_of_plan": [
+                            {
+                              "plan_prefix": [
+                                "`pom_follow_huawei_bind` `a1`",
+                                "`pro_project` `c1`"
+                              ],
+                              "table": "`conm_contract` `b1`",
+                              "best_access_path": {
+                                "considered_access_paths": [
+                                  {
+                                    "access_type": "eq_ref",
+                                    "index": "PRIMARY",
+                                    "rows": 1,
+                                    "cost": 136.15,
+                                    "chosen": true,
+                                    "cause": "clustered_pk_chosen_by_heuristics"
+                                  },
+                                  {
+                                    "access_type": "scan",
+                                    "cost": 1369.15,
+                                    "rows": 12649,
+                                    "chosen": false,
+                                    "cause": "cost"
+                                  }
+                                ]
+                              },
+                              "added_to_eq_ref_extension": true,
+                              "condition_filtering_pct": 100,
+                              "rows_for_plan": 389,
+                              "cost_for_plan": 313.075,
+                              "sort_cost": 389,
+                              "new_cost_for_plan": 702.075,
+                              "chosen": true
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "plan_prefix": [],
+                      "table": "`pro_project` `c1`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "access_type": "ref",
+                            "index": "PRIMARY",
+                            "usable": false,
+                            "chosen": false
+                          },
+                          {
+                            "rows_to_scan": 1473,
+                            "filtering_effect": [],
+                            "final_filtering_effect": 1,
+                            "access_type": "scan",
+                            "resulting_rows": 1473,
+                            "cost": 152.8,
+                            "chosen": true
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 1473,
+                      "cost_for_plan": 152.8,
+                      "rest_of_plan": [
+                        {
+                          "plan_prefix": ["`pro_project` `c1`"],
+                          "table": "`pom_follow_huawei_bind` `a1`",
+                          "best_access_path": {
+                            "considered_access_paths": [
+                              {
+                                "rows_to_scan": 389,
+                                "filtering_effect": [],
+                                "final_filtering_effect": 1,
+                                "access_type": "scan",
+                                "using_join_cache": true,
+                                "buffers_needed": 5,
+                                "resulting_rows": 389,
+                                "cost": 57309.8,
+                                "chosen": true
+                              }
+                            ]
+                          },
+                          "condition_filtering_pct": 10,
+                          "rows_for_plan": 57299.7,
+                          "cost_for_plan": 57462.6,
+                          "pruned_by_cost": true
+                        },
+                        {
+                          "plan_prefix": ["`pro_project` `c1`"],
+                          "table": "`conm_contract` `b1`",
+                          "best_access_path": {
+                            "considered_access_paths": [
+                              {
+                                "access_type": "ref",
+                                "index": "PRIMARY",
+                                "usable": false,
+                                "chosen": false
+                              },
+                              {
+                                "rows_to_scan": 12649,
+                                "filtering_effect": [],
+                                "final_filtering_effect": 1,
+                                "access_type": "scan",
+                                "using_join_cache": true,
+                                "buffers_needed": 5,
+                                "resulting_rows": 12649,
+                                "cost": 1.86376e6,
+                                "chosen": true
+                              }
+                            ]
+                          },
+                          "condition_filtering_pct": 100,
+                          "rows_for_plan": 1.8632e7,
+                          "cost_for_plan": 1.86391e6,
+                          "pruned_by_cost": true
+                        }
+                      ]
+                    },
+                    {
+                      "plan_prefix": [],
+                      "table": "`conm_contract` `b1`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "access_type": "ref",
+                            "index": "PRIMARY",
+                            "usable": false,
+                            "chosen": false
+                          },
+                          {
+                            "rows_to_scan": 12649,
+                            "filtering_effect": [],
+                            "final_filtering_effect": 1,
+                            "access_type": "scan",
+                            "resulting_rows": 12649,
+                            "cost": 1369.15,
+                            "chosen": true
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 12649,
+                      "cost_for_plan": 1369.15,
+                      "pruned_by_cost": true
+                    }
+                  ]
+                },
+                {
+                  "attaching_conditions_to_tables": {
+                    "original_condition": "((`c1`.`id` = `a1`.`projectid`) and (`b1`.`id` = `a1`.`contractid`))",
+                    "attached_conditions_computation": [],
+                    "attached_conditions_summary": [
+                      {
+                        "table": "`pom_follow_huawei_bind` `a1`",
+                        "attached": "((`a1`.`projectid` is not null) and (`a1`.`contractid` is not null))"
+                      },
+                      {
+                        "table": "`pro_project` `c1`",
+                        "attached": "(`c1`.`id` = `a1`.`projectid`)"
+                      },
+                      {
+                        "table": "`conm_contract` `b1`",
+                        "attached": "(`b1`.`id` = `a1`.`contractid`)"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "optimizing_distinct_group_by_order_by": {
+                    "simplifying_group_by": {
+                      "original_clause": "`a1`.`pom_id`",
+                      "items": [
+                        {
+                          "item": "`a1`.`pom_id`"
+                        }
+                      ],
+                      "resulting_clause_is_simple": true,
+                      "resulting_clause": "`a1`.`pom_id`"
+                    }
+                  }
+                },
+                {
+                  "reconsidering_access_paths_for_index_ordering": {
+                    "clause": "GROUP BY",
+                    "steps": [],
+                    "index_order_summary": {
+                      "table": "`pom_follow_huawei_bind` `a1`",
+                      "index_provides_order": true,
+                      "order_direction": "asc",
+                      "index": "bindindex1",
+                      "plan_changed": false
+                    }
+                  }
+                },
+                {
+                  "finalizing_table_conditions": [
+                    {
+                      "table": "`pom_follow_huawei_bind` `a1`",
+                      "original_table_condition": "((`a1`.`projectid` is not null) and (`a1`.`contractid` is not null))",
+                      "final_table_condition   ": "((`a1`.`projectid` is not null) and (`a1`.`contractid` is not null))"
+                    },
+                    {
+                      "table": "`pro_project` `c1`",
+                      "original_table_condition": "(`c1`.`id` = `a1`.`projectid`)",
+                      "final_table_condition   ": null
+                    },
+                    {
+                      "table": "`conm_contract` `b1`",
+                      "original_table_condition": "(`b1`.`id` = `a1`.`contractid`)",
+                      "final_table_condition   ": null
+                    }
+                  ]
+                },
+                {
+                  "refine_plan": [
+                    {
+                      "table": "`pom_follow_huawei_bind` `a1`"
+                    },
+                    {
+                      "table": "`pro_project` `c1`"
+                    },
+                    {
+                      "table": "`conm_contract` `b1`"
+                    }
+                  ]
+                },
+                {
+                  "considering_tmp_tables": [
+                    {
+                      "creating_tmp_table": {
+                        "tmp_table_info": {
+                          "table": "intermediate_tmp_table",
+                          "columns": 1,
+                          "row_length": 768,
+                          "key_length": 0,
+                          "unique_constraint": false,
+                          "makes_grouped_rows": false,
+                          "cannot_insert_duplicates": false,
+                          "location": "TempTable"
+                        }
+                      }
+                    },
+                    {
+                      "creating_tmp_table": {
+                        "tmp_table_info": {
+                          "table": "intermediate_tmp_table",
+                          "columns": 1,
+                          "row_length": 768,
+                          "key_length": 0,
+                          "unique_constraint": false,
+                          "makes_grouped_rows": false,
+                          "cannot_insert_duplicates": false,
+                          "location": "TempTable"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "join_optimization": {
+              "select#": 3,
+              "steps": [
+                {
+                  "join_optimization": {
+                    "select#": 4,
+                    "steps": [
+                      {
+                        "condition_processing": {
+                          "condition": "WHERE",
+                          "original_condition": "(`a9`.`des_id` = `b9`.`des_id`)",
+                          "steps": [
+                            {
+                              "transformation": "equality_propagation",
+                              "resulting_condition": "multiple equal(`a9`.`des_id`, `b9`.`des_id`)"
+                            },
+                            {
+                              "transformation": "constant_propagation",
+                              "resulting_condition": "multiple equal(`a9`.`des_id`, `b9`.`des_id`)"
+                            },
+                            {
+                              "transformation": "trivial_condition_removal",
+                              "resulting_condition": "multiple equal(`a9`.`des_id`, `b9`.`des_id`)"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "substitute_generated_columns": {}
+                      },
+                      {
+                        "table_dependencies": [
+                          {
+                            "table": "`icm_bill` `a9`",
+                            "row_may_be_null": false,
+                            "map_bit": 0,
+                            "depends_on_map_bits": []
+                          },
+                          {
+                            "table": "`icm_des_pom_done` `b9`",
+                            "row_may_be_null": false,
+                            "map_bit": 1,
+                            "depends_on_map_bits": []
+                          }
+                        ]
+                      },
+                      {
+                        "ref_optimizer_key_uses": [
+                          {
+                            "table": "`icm_bill` `a9`",
+                            "field": "des_id",
+                            "equals": "`b9`.`des_id`",
+                            "null_rejecting": true
+                          },
+                          {
+                            "table": "`icm_des_pom_done` `b9`",
+                            "field": "des_id",
+                            "equals": "`a9`.`des_id`",
+                            "null_rejecting": true
+                          }
+                        ]
+                      },
+                      {
+                        "rows_estimation": [
+                          {
+                            "table": "`icm_bill` `a9`",
+                            "table_scan": {
+                              "rows": 19133,
+                              "cost": 24.25
+                            }
+                          },
+                          {
+                            "table": "`icm_des_pom_done` `b9`",
+                            "const_keys_added": {
+                              "keys": ["icm_des_pom_done$3"],
+                              "cause": "group_by"
+                            },
+                            "range_analysis": {
+                              "table_scan": {
+                                "rows": 1190500,
+                                "cost": 122928
+                              },
+                              "potential_range_indexes": [
+                                {
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "cause": "not_applicable"
+                                },
+                                {
+                                  "index": "icm_des_pom_done$1",
+                                  "usable": false,
+                                  "cause": "not_applicable"
+                                },
+                                {
+                                  "index": "icm_des_pom_done$2",
+                                  "usable": false,
+                                  "cause": "not_applicable"
+                                },
+                                {
+                                  "index": "icm_des_pom_done$3",
+                                  "usable": true,
+                                  "key_parts": ["pom_id", "id"]
+                                }
+                              ],
+                              "setup_range_conditions": [],
+                              "group_index_range": {
+                                "chosen": false,
+                                "cause": "not_single_table"
+                              },
+                              "skip_scan_range": {
+                                "chosen": false,
+                                "cause": "not_single_table"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "considered_execution_plans": [
+                          {
+                            "plan_prefix": [],
+                            "table": "`icm_bill` `a9`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "icm_bill$1",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "rows_to_scan": 19133,
+                                  "filtering_effect": [],
+                                  "final_filtering_effect": 1,
+                                  "access_type": "scan",
+                                  "resulting_rows": 19133,
+                                  "cost": 1937.55,
+                                  "chosen": true
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 19133,
+                            "cost_for_plan": 1937.55,
+                            "rest_of_plan": [
+                              {
+                                "plan_prefix": ["`icm_bill` `a9`"],
+                                "table": "`icm_des_pom_done` `b9`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "ref",
+                                      "index": "icm_des_pom_done$2",
+                                      "rows": 123.985,
+                                      "cost": 2.60889e6,
+                                      "chosen": true
+                                    },
+                                    {
+                                      "rows_to_scan": 1190500,
+                                      "filtering_effect": [],
+                                      "final_filtering_effect": 1,
+                                      "access_type": "scan",
+                                      "using_join_cache": true,
+                                      "buffers_needed": 57,
+                                      "resulting_rows": 1.1905e6,
+                                      "cost": 2.27801e9,
+                                      "chosen": false
+                                    }
+                                  ]
+                                },
+                                "condition_filtering_pct": 100,
+                                "rows_for_plan": 2.3722e6,
+                                "cost_for_plan": 2.61083e6,
+                                "sort_cost": 2.3722e6,
+                                "new_cost_for_plan": 4.98302e6,
+                                "chosen": true
+                              }
+                            ]
+                          },
+                          {
+                            "plan_prefix": [],
+                            "table": "`icm_des_pom_done` `b9`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "icm_des_pom_done$2",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "rows_to_scan": 1190500,
+                                  "filtering_effect": [],
+                                  "final_filtering_effect": 1,
+                                  "access_type": "scan",
+                                  "resulting_rows": 1.1905e6,
+                                  "cost": 122926,
+                                  "chosen": true,
+                                  "use_tmp_table": true
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 1.1905e6,
+                            "cost_for_plan": 122926,
+                            "rest_of_plan": [
+                              {
+                                "plan_prefix": ["`icm_des_pom_done` `b9`"],
+                                "table": "`icm_bill` `a9`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "eq_ref",
+                                      "index": "icm_bill$1",
+                                      "rows": 1,
+                                      "cost": 416675,
+                                      "chosen": true
+                                    },
+                                    {
+                                      "rows_to_scan": 19133,
+                                      "filtering_effect": [],
+                                      "final_filtering_effect": 1,
+                                      "access_type": "scan",
+                                      "using_join_cache": true,
+                                      "buffers_needed": 37,
+                                      "resulting_rows": 19133,
+                                      "cost": 2.27778e9,
+                                      "chosen": false
+                                    }
+                                  ]
+                                },
+                                "condition_filtering_pct": 100,
+                                "rows_for_plan": 1.1905e6,
+                                "cost_for_plan": 539601,
+                                "sort_cost": 1.1905e6,
+                                "new_cost_for_plan": 1.7301e6,
+                                "chosen": true
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "attaching_conditions_to_tables": {
+                          "original_condition": "(`a9`.`des_id` = `b9`.`des_id`)",
+                          "attached_conditions_computation": [],
+                          "attached_conditions_summary": [
+                            {
+                              "table": "`icm_des_pom_done` `b9`",
+                              "attached": null
+                            },
+                            {
+                              "table": "`icm_bill` `a9`",
+                              "attached": "(`a9`.`des_id` = `b9`.`des_id`)"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "optimizing_distinct_group_by_order_by": {
+                          "simplifying_group_by": {
+                            "original_clause": "`b9`.`pom_id`",
+                            "items": [
+                              {
+                                "item": "`b9`.`pom_id`"
+                              }
+                            ],
+                            "resulting_clause_is_simple": true,
+                            "resulting_clause": "`b9`.`pom_id`"
+                          }
+                        }
+                      },
+                      {
+                        "reconsidering_access_paths_for_index_ordering": {
+                          "clause": "GROUP BY",
+                          "steps": [],
+                          "index_order_summary": {
+                            "table": "`icm_des_pom_done` `b9`",
+                            "index_provides_order": false,
+                            "order_direction": "undefined",
+                            "index": "unknown",
+                            "plan_changed": false
+                          }
+                        }
+                      },
+                      {
+                        "finalizing_table_conditions": [
+                          {
+                            "table": "`icm_bill` `a9`",
+                            "original_table_condition": "(`a9`.`des_id` = `b9`.`des_id`)",
+                            "final_table_condition   ": null
+                          }
+                        ]
+                      },
+                      {
+                        "refine_plan": [
+                          {
+                            "table": "`icm_des_pom_done` `b9`"
+                          },
+                          {
+                            "table": "`icm_bill` `a9`"
+                          }
+                        ]
+                      },
+                      {
+                        "considering_tmp_tables": [
+                          {
+                            "creating_tmp_table": {
+                              "tmp_table_info": {
+                                "table": "intermediate_tmp_table",
+                                "columns": 1,
+                                "row_length": 6,
+                                "key_length": 0,
+                                "unique_constraint": false,
+                                "makes_grouped_rows": false,
+                                "cannot_insert_duplicates": false,
+                                "location": "TempTable"
+                              }
+                            }
+                          },
+                          {
+                            "creating_tmp_table": {
+                              "tmp_table_info": {
+                                "table": "intermediate_tmp_table",
+                                "columns": 1,
+                                "row_length": 768,
+                                "key_length": 0,
+                                "unique_constraint": false,
+                                "makes_grouped_rows": false,
+                                "cannot_insert_duplicates": false,
+                                "location": "TempTable"
+                              }
+                            }
+                          },
+                          {
+                            "adding_sort_to_table": "b9"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "condition_processing": {
+                    "condition": "WHERE",
+                    "original_condition": "((`a2`.`contractid` = `b2`.`id`) and (`a2`.`projectid` = `c2`.`id`))",
+                    "steps": [
+                      {
+                        "transformation": "equality_propagation",
+                        "resulting_condition": "(multiple equal(`a2`.`contractid`, `b2`.`id`) and multiple equal(`a2`.`projectid`, `c2`.`id`))"
+                      },
+                      {
+                        "transformation": "constant_propagation",
+                        "resulting_condition": "(multiple equal(`a2`.`contractid`, `b2`.`id`) and multiple equal(`a2`.`projectid`, `c2`.`id`))"
+                      },
+                      {
+                        "transformation": "trivial_condition_removal",
+                        "resulting_condition": "(multiple equal(`a2`.`contractid`, `b2`.`id`) and multiple equal(`a2`.`projectid`, `c2`.`id`))"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "substitute_generated_columns": {}
+                },
+                {
+                  "table_dependencies": [
+                    {
+                      "table": "`pom_order_huawei_bind` `a2`",
+                      "row_may_be_null": false,
+                      "map_bit": 0,
+                      "depends_on_map_bits": []
+                    },
+                    {
+                      "table": "`conm_contract` `b2`",
+                      "row_may_be_null": false,
+                      "map_bit": 1,
+                      "depends_on_map_bits": []
+                    },
+                    {
+                      "table": "`pro_project` `c2`",
+                      "row_may_be_null": false,
+                      "map_bit": 2,
+                      "depends_on_map_bits": []
+                    },
+                    {
+                      "table": " `invoice_bind`",
+                      "row_may_be_null": true,
+                      "map_bit": 3,
+                      "depends_on_map_bits": [0]
+                    }
+                  ]
+                },
+                {
+                  "ref_optimizer_key_uses": [
+                    {
+                      "table": "`pom_order_huawei_bind` `a2`",
+                      "field": "projectid",
+                      "equals": "`c2`.`id`",
+                      "null_rejecting": true
+                    },
+                    {
+                      "table": "`pom_order_huawei_bind` `a2`",
+                      "field": "contractid",
+                      "equals": "`b2`.`id`",
+                      "null_rejecting": true
+                    },
+                    {
+                      "table": "`conm_contract` `b2`",
+                      "field": "id",
+                      "equals": "`a2`.`contractid`",
+                      "null_rejecting": true
+                    },
+                    {
+                      "table": "`pro_project` `c2`",
+                      "field": "id",
+                      "equals": "`a2`.`projectid`",
+                      "null_rejecting": true
+                    },
+                    {
+                      "table": " `invoice_bind`",
+                      "field": "pom_id",
+                      "equals": "`a2`.`pom_id`",
+                      "null_rejecting": true
+                    },
+                    {
+                      "table": " `invoice_bind`",
+                      "field": "pom_id",
+                      "equals": "`a2`.`pom_id`",
+                      "null_rejecting": true
+                    }
+                  ]
+                },
+                {
+                  "rows_estimation": [
+                    {
+                      "table": "`pom_order_huawei_bind` `a2`",
+                      "const_keys_added": {
+                        "keys": ["idx_pom_order_huawei_bind-pom_id_real"],
+                        "cause": "group_by"
+                      },
+                      "range_analysis": {
+                        "table_scan": {
+                          "rows": 1225579,
+                          "cost": 123626
+                        },
+                        "potential_range_indexes": [
+                          {
+                            "index": "PRIMARY",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "idx_pom_order_huawei_bind-pom_id_real",
+                            "usable": true,
+                            "key_parts": ["pom_id_real", "id", "pom_id"]
+                          },
+                          {
+                            "index": "idx_pom_order_huawei_bind-projectid",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "idx_pom_order_huawei_bind-pom_id",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "idx_pom_order_huawei_bind-contractid",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          }
+                        ],
+                        "setup_range_conditions": [],
+                        "group_index_range": {
+                          "chosen": false,
+                          "cause": "not_single_table"
+                        },
+                        "skip_scan_range": {
+                          "chosen": false,
+                          "cause": "not_single_table"
+                        }
+                      }
+                    },
+                    {
+                      "table": "`conm_contract` `b2`",
+                      "table_scan": {
+                        "rows": 12649,
+                        "cost": 104.25
+                      }
+                    },
+                    {
+                      "table": "`pro_project` `c2`",
+                      "table_scan": {
+                        "rows": 1473,
+                        "cost": 5.5
+                      }
+                    },
+                    {
+                      "table": " `invoice_bind`",
+                      "table_scan": {
+                        "rows": 1190500,
+                        "cost": 14883.8
+                      }
+                    }
+                  ]
+                },
+                {
+                  "considered_execution_plans": [
+                    {
+                      "plan_prefix": [],
+                      "table": "`pro_project` `c2`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "access_type": "ref",
+                            "index": "PRIMARY",
+                            "usable": false,
+                            "chosen": false
+                          },
+                          {
+                            "rows_to_scan": 1473,
+                            "filtering_effect": [],
+                            "final_filtering_effect": 1,
+                            "access_type": "scan",
+                            "resulting_rows": 1473,
+                            "cost": 152.8,
+                            "chosen": true
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 1473,
+                      "cost_for_plan": 152.8,
+                      "rest_of_plan": [
+                        {
+                          "plan_prefix": ["`pro_project` `c2`"],
+                          "table": "`conm_contract` `b2`",
+                          "best_access_path": {
+                            "considered_access_paths": [
+                              {
+                                "access_type": "ref",
+                                "index": "PRIMARY",
+                                "usable": false,
+                                "chosen": false
+                              },
+                              {
+                                "rows_to_scan": 12649,
+                                "filtering_effect": [],
+                                "final_filtering_effect": 1,
+                                "access_type": "scan",
+                                "using_join_cache": true,
+                                "buffers_needed": 5,
+                                "resulting_rows": 12649,
+                                "cost": 1.86376e6,
+                                "chosen": true
+                              }
+                            ]
+                          },
+                          "condition_filtering_pct": 100,
+                          "rows_for_plan": 1.8632e7,
+                          "cost_for_plan": 1.86391e6,
+                          "rest_of_plan": [
+                            {
+                              "plan_prefix": [
+                                "`pro_project` `c2`",
+                                "`conm_contract` `b2`"
+                              ],
+                              "table": "`pom_order_huawei_bind` `a2`",
+                              "best_access_path": {
+                                "considered_access_paths": [
+                                  {
+                                    "access_type": "ref",
+                                    "index": "idx_pom_order_huawei_bind-projectid",
+                                    "rows": 8570.48,
+                                    "cost": 5.58898e10,
+                                    "chosen": true
+                                  },
+                                  {
+                                    "access_type": "ref",
+                                    "index": "idx_pom_order_huawei_bind-contractid",
+                                    "rows": 10845.8,
+                                    "cost": 7.07278e10,
+                                    "chosen": false
+                                  },
+                                  {
+                                    "rows_to_scan": 1225579,
+                                    "filtering_effect": [],
+                                    "final_filtering_effect": 1,
+                                    "access_type": "scan",
+                                    "using_join_cache": true,
+                                    "buffers_needed": 110309,
+                                    "resulting_rows": 1.22558e6,
+                                    "cost": 2.28361e12,
+                                    "chosen": false
+                                  }
+                                ]
+                              },
+                              "condition_filtering_pct": 0.884956,
+                              "rows_for_plan": 1.41314e9,
+                              "cost_for_plan": 5.58916e10,
+                              "rest_of_plan": [
+                                {
+                                  "plan_prefix": [
+                                    "`pro_project` `c2`",
+                                    "`conm_contract` `b2`",
+                                    "`pom_order_huawei_bind` `a2`"
+                                  ],
+                                  "table": " `invoice_bind`",
+                                  "best_access_path": {
+                                    "considered_access_paths": [
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key0>",
+                                        "rows": 10,
+                                        "cost": 4.946e9,
+                                        "chosen": true
+                                      },
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key1>",
+                                        "rows": 10,
+                                        "cost": 4.946e9,
+                                        "chosen": false
+                                      },
+                                      {
+                                        "rows_to_scan": 1190500,
+                                        "access_type": "scan",
+                                        "using_join_cache": true,
+                                        "buffers_needed": 8808418,
+                                        "resulting_rows": 1.1905e6,
+                                        "cost": 1.68366e14,
+                                        "chosen": false
+                                      }
+                                    ]
+                                  },
+                                  "condition_filtering_pct": 100,
+                                  "rows_for_plan": 1.41314e10,
+                                  "cost_for_plan": 6.08376e10,
+                                  "sort_cost": 1.41314e10,
+                                  "new_cost_for_plan": 7.4969e10,
+                                  "chosen": true
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "plan_prefix": ["`pro_project` `c2`"],
+                          "table": "`pom_order_huawei_bind` `a2`",
+                          "best_access_path": {
+                            "considered_access_paths": [
+                              {
+                                "access_type": "ref",
+                                "index": "idx_pom_order_huawei_bind-projectid",
+                                "rows": 8570.48,
+                                "cost": 4.41851e6,
+                                "chosen": true
+                              },
+                              {
+                                "access_type": "ref",
+                                "index": "idx_pom_order_huawei_bind-contractid",
+                                "usable": false,
+                                "chosen": false
+                              },
+                              {
+                                "rows_to_scan": 1225579,
+                                "filtering_effect": [],
+                                "final_filtering_effect": 1,
+                                "access_type": "scan",
+                                "using_join_cache": true,
+                                "buffers_needed": 5,
+                                "resulting_rows": 1.22558e6,
+                                "cost": 1.80533e8,
+                                "chosen": false
+                              }
+                            ]
+                          },
+                          "condition_filtering_pct": 100,
+                          "rows_for_plan": 1.26243e7,
+                          "cost_for_plan": 4.41867e6,
+                          "rest_of_plan": [
+                            {
+                              "plan_prefix": [
+                                "`pro_project` `c2`",
+                                "`pom_order_huawei_bind` `a2`"
+                              ],
+                              "table": "`conm_contract` `b2`",
+                              "best_access_path": {
+                                "considered_access_paths": [
+                                  {
+                                    "access_type": "eq_ref",
+                                    "index": "PRIMARY",
+                                    "rows": 1,
+                                    "cost": 4.41851e6,
+                                    "chosen": true,
+                                    "cause": "clustered_pk_chosen_by_heuristics"
+                                  },
+                                  {
+                                    "access_type": "scan",
+                                    "chosen": false,
+                                    "cause": "covering_index_better_than_full_scan"
+                                  }
+                                ]
+                              },
+                              "condition_filtering_pct": 100,
+                              "rows_for_plan": 1.26243e7,
+                              "cost_for_plan": 8.83718e6,
+                              "rest_of_plan": [
+                                {
+                                  "plan_prefix": [
+                                    "`pro_project` `c2`",
+                                    "`pom_order_huawei_bind` `a2`",
+                                    "`conm_contract` `b2`"
+                                  ],
+                                  "table": " `invoice_bind`",
+                                  "best_access_path": {
+                                    "considered_access_paths": [
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key0>",
+                                        "rows": 10,
+                                        "cost": 4.41851e7,
+                                        "chosen": true
+                                      },
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key1>",
+                                        "rows": 10,
+                                        "cost": 4.41851e7,
+                                        "chosen": false
+                                      },
+                                      {
+                                        "rows_to_scan": 1190500,
+                                        "access_type": "scan",
+                                        "using_join_cache": true,
+                                        "buffers_needed": 78691,
+                                        "resulting_rows": 1.1905e6,
+                                        "cost": 1.5041e12,
+                                        "chosen": false
+                                      }
+                                    ]
+                                  },
+                                  "added_to_eq_ref_extension": false
+                                },
+                                {
+                                  "plan_prefix": [
+                                    "`pro_project` `c2`",
+                                    "`pom_order_huawei_bind` `a2`",
+                                    "`conm_contract` `b2`"
+                                  ],
+                                  "table": " `invoice_bind`",
+                                  "best_access_path": {
+                                    "considered_access_paths": [
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key0>",
+                                        "rows": 10,
+                                        "cost": 4.41851e7,
+                                        "chosen": true
+                                      },
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key1>",
+                                        "rows": 10,
+                                        "cost": 4.41851e7,
+                                        "chosen": false
+                                      },
+                                      {
+                                        "rows_to_scan": 1190500,
+                                        "access_type": "scan",
+                                        "using_join_cache": true,
+                                        "buffers_needed": 78691,
+                                        "resulting_rows": 1.1905e6,
+                                        "cost": 1.5041e12,
+                                        "chosen": false
+                                      }
+                                    ]
+                                  },
+                                  "condition_filtering_pct": 100,
+                                  "rows_for_plan": 1.26243e8,
+                                  "cost_for_plan": 5.30223e7,
+                                  "sort_cost": 1.26243e8,
+                                  "new_cost_for_plan": 1.79266e8,
+                                  "chosen": true
+                                }
+                              ]
+                            },
+                            {
+                              "plan_prefix": [
+                                "`pro_project` `c2`",
+                                "`pom_order_huawei_bind` `a2`"
+                              ],
+                              "table": " `invoice_bind`",
+                              "best_access_path": {
+                                "considered_access_paths": [
+                                  {
+                                    "access_type": "ref",
+                                    "index": "<auto_key0>",
+                                    "rows": 10,
+                                    "cost": 4.41851e7,
+                                    "chosen": true
+                                  },
+                                  {
+                                    "access_type": "ref",
+                                    "index": "<auto_key1>",
+                                    "rows": 10,
+                                    "cost": 4.41851e7,
+                                    "chosen": false
+                                  },
+                                  {
+                                    "rows_to_scan": 1190500,
+                                    "access_type": "scan",
+                                    "using_join_cache": true,
+                                    "buffers_needed": 41320,
+                                    "resulting_rows": 1.1905e6,
+                                    "cost": 1.50354e12,
+                                    "chosen": false
+                                  }
+                                ]
+                              },
+                              "condition_filtering_pct": 100,
+                              "rows_for_plan": 1.26243e8,
+                              "cost_for_plan": 4.86038e7,
+                              "pruned_by_heuristic": true
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "plan_prefix": [],
+                      "table": "`conm_contract` `b2`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "access_type": "ref",
+                            "index": "PRIMARY",
+                            "usable": false,
+                            "chosen": false
+                          },
+                          {
+                            "rows_to_scan": 12649,
+                            "filtering_effect": [],
+                            "final_filtering_effect": 1,
+                            "access_type": "scan",
+                            "resulting_rows": 12649,
+                            "cost": 1369.15,
+                            "chosen": true
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 12649,
+                      "cost_for_plan": 1369.15,
+                      "rest_of_plan": [
+                        {
+                          "plan_prefix": ["`conm_contract` `b2`"],
+                          "table": "`pro_project` `c2`",
+                          "best_access_path": {
+                            "considered_access_paths": [
+                              {
+                                "access_type": "ref",
+                                "index": "PRIMARY",
+                                "usable": false,
+                                "chosen": false
+                              },
+                              {
+                                "rows_to_scan": 1473,
+                                "filtering_effect": [],
+                                "final_filtering_effect": 1,
+                                "access_type": "scan",
+                                "using_join_cache": true,
+                                "buffers_needed": 38,
+                                "resulting_rows": 1473,
+                                "cost": 1.86341e6,
+                                "chosen": true
+                              }
+                            ]
+                          },
+                          "condition_filtering_pct": 100,
+                          "rows_for_plan": 1.8632e7,
+                          "cost_for_plan": 1.86478e6,
+                          "rest_of_plan": [
+                            {
+                              "plan_prefix": [
+                                "`conm_contract` `b2`",
+                                "`pro_project` `c2`"
+                              ],
+                              "table": "`pom_order_huawei_bind` `a2`",
+                              "best_access_path": {
+                                "considered_access_paths": [
+                                  {
+                                    "access_type": "ref",
+                                    "index": "idx_pom_order_huawei_bind-projectid",
+                                    "rows": 8570.48,
+                                    "cost": 5.58898e10,
+                                    "chosen": true
+                                  },
+                                  {
+                                    "access_type": "ref",
+                                    "index": "idx_pom_order_huawei_bind-contractid",
+                                    "rows": 10845.8,
+                                    "cost": 7.07278e10,
+                                    "chosen": false
+                                  },
+                                  {
+                                    "rows_to_scan": 1225579,
+                                    "filtering_effect": [],
+                                    "final_filtering_effect": 1,
+                                    "access_type": "scan",
+                                    "using_join_cache": true,
+                                    "buffers_needed": 110309,
+                                    "resulting_rows": 1.22558e6,
+                                    "cost": 2.28361e12,
+                                    "chosen": false
+                                  }
+                                ]
+                              },
+                              "condition_filtering_pct": 0.884956,
+                              "rows_for_plan": 1.41314e9,
+                              "cost_for_plan": 5.58916e10,
+                              "pruned_by_cost": true
+                            }
+                          ]
+                        },
+                        {
+                          "plan_prefix": ["`conm_contract` `b2`"],
+                          "table": "`pom_order_huawei_bind` `a2`",
+                          "best_access_path": {
+                            "considered_access_paths": [
+                              {
+                                "access_type": "ref",
+                                "index": "idx_pom_order_huawei_bind-projectid",
+                                "usable": false,
+                                "chosen": false
+                              },
+                              {
+                                "access_type": "ref",
+                                "index": "idx_pom_order_huawei_bind-contractid",
+                                "rows": 10845.8,
+                                "cost": 4.80161e7,
+                                "chosen": true
+                              },
+                              {
+                                "rows_to_scan": 1225579,
+                                "filtering_effect": [],
+                                "final_filtering_effect": 1,
+                                "access_type": "scan",
+                                "using_join_cache": true,
+                                "buffers_needed": 38,
+                                "resulting_rows": 1.22558e6,
+                                "cost": 1.55028e9,
+                                "chosen": false
+                              }
+                            ]
+                          },
+                          "condition_filtering_pct": 100,
+                          "rows_for_plan": 1.37189e8,
+                          "cost_for_plan": 4.80175e7,
+                          "rest_of_plan": [
+                            {
+                              "plan_prefix": [
+                                "`conm_contract` `b2`",
+                                "`pom_order_huawei_bind` `a2`"
+                              ],
+                              "table": "`pro_project` `c2`",
+                              "best_access_path": {
+                                "considered_access_paths": [
+                                  {
+                                    "access_type": "eq_ref",
+                                    "index": "PRIMARY",
+                                    "rows": 1,
+                                    "cost": 4.80161e7,
+                                    "chosen": true,
+                                    "cause": "clustered_pk_chosen_by_heuristics"
+                                  },
+                                  {
+                                    "rows_to_scan": 1473,
+                                    "filtering_effect": [],
+                                    "final_filtering_effect": 1,
+                                    "access_type": "scan",
+                                    "using_join_cache": true,
+                                    "buffers_needed": 449021,
+                                    "resulting_rows": 1473,
+                                    "cost": 2.02104e10,
+                                    "chosen": false
+                                  }
+                                ]
+                              },
+                              "condition_filtering_pct": 100,
+                              "rows_for_plan": 1.37189e8,
+                              "cost_for_plan": 9.60336e7,
+                              "rest_of_plan": [
+                                {
+                                  "plan_prefix": [
+                                    "`conm_contract` `b2`",
+                                    "`pom_order_huawei_bind` `a2`",
+                                    "`pro_project` `c2`"
+                                  ],
+                                  "table": " `invoice_bind`",
+                                  "best_access_path": {
+                                    "considered_access_paths": [
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key0>",
+                                        "rows": 10,
+                                        "cost": 4.80161e8,
+                                        "chosen": true
+                                      },
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key1>",
+                                        "rows": 10,
+                                        "cost": 4.80161e8,
+                                        "chosen": false
+                                      },
+                                      {
+                                        "rows_to_scan": 1190500,
+                                        "access_type": "scan",
+                                        "using_join_cache": true,
+                                        "buffers_needed": 855129,
+                                        "resulting_rows": 1.1905e6,
+                                        "cost": 1.63451e13,
+                                        "chosen": false
+                                      }
+                                    ]
+                                  },
+                                  "added_to_eq_ref_extension": false
+                                },
+                                {
+                                  "plan_prefix": [
+                                    "`conm_contract` `b2`",
+                                    "`pom_order_huawei_bind` `a2`",
+                                    "`pro_project` `c2`"
+                                  ],
+                                  "table": " `invoice_bind`",
+                                  "best_access_path": {
+                                    "considered_access_paths": [
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key0>",
+                                        "rows": 10,
+                                        "cost": 4.80161e8,
+                                        "chosen": true
+                                      },
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key1>",
+                                        "rows": 10,
+                                        "cost": 4.80161e8,
+                                        "chosen": false
+                                      },
+                                      {
+                                        "rows_to_scan": 1190500,
+                                        "access_type": "scan",
+                                        "using_join_cache": true,
+                                        "buffers_needed": 855129,
+                                        "resulting_rows": 1.1905e6,
+                                        "cost": 1.63451e13,
+                                        "chosen": false
+                                      }
+                                    ]
+                                  },
+                                  "condition_filtering_pct": 100,
+                                  "rows_for_plan": 1.37189e9,
+                                  "cost_for_plan": 5.76195e8,
+                                  "pruned_by_cost": true
+                                }
+                              ]
+                            },
+                            {
+                              "plan_prefix": [
+                                "`conm_contract` `b2`",
+                                "`pom_order_huawei_bind` `a2`"
+                              ],
+                              "table": " `invoice_bind`",
+                              "best_access_path": {
+                                "considered_access_paths": [
+                                  {
+                                    "access_type": "ref",
+                                    "index": "<auto_key0>",
+                                    "rows": 10,
+                                    "cost": 4.80161e8,
+                                    "chosen": true
+                                  },
+                                  {
+                                    "access_type": "ref",
+                                    "index": "<auto_key1>",
+                                    "rows": 10,
+                                    "cost": 4.80161e8,
+                                    "chosen": false
+                                  },
+                                  {
+                                    "rows_to_scan": 1190500,
+                                    "access_type": "scan",
+                                    "using_join_cache": true,
+                                    "buffers_needed": 449021,
+                                    "resulting_rows": 1.1905e6,
+                                    "cost": 1.6339e13,
+                                    "chosen": false
+                                  }
+                                ]
+                              },
+                              "condition_filtering_pct": 100,
+                              "rows_for_plan": 1.37189e9,
+                              "cost_for_plan": 5.28179e8,
+                              "pruned_by_cost": true
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "plan_prefix": [],
+                      "table": "`pom_order_huawei_bind` `a2`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "access_type": "ref",
+                            "index": "idx_pom_order_huawei_bind-projectid",
+                            "usable": false,
+                            "chosen": false
+                          },
+                          {
+                            "access_type": "ref",
+                            "index": "idx_pom_order_huawei_bind-contractid",
+                            "usable": false,
+                            "chosen": false
+                          },
+                          {
+                            "rows_to_scan": 1225579,
+                            "filtering_effect": [],
+                            "final_filtering_effect": 1,
+                            "access_type": "scan",
+                            "resulting_rows": 1.22558e6,
+                            "cost": 123624,
+                            "chosen": true,
+                            "use_tmp_table": true
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 1.22558e6,
+                      "cost_for_plan": 123624,
+                      "rest_of_plan": [
+                        {
+                          "plan_prefix": ["`pom_order_huawei_bind` `a2`"],
+                          "table": "`pro_project` `c2`",
+                          "best_access_path": {
+                            "considered_access_paths": [
+                              {
+                                "access_type": "eq_ref",
+                                "index": "PRIMARY",
+                                "rows": 1,
+                                "cost": 428953,
+                                "chosen": true,
+                                "cause": "clustered_pk_chosen_by_heuristics"
+                              },
+                              {
+                                "rows_to_scan": 1473,
+                                "filtering_effect": [],
+                                "final_filtering_effect": 1,
+                                "access_type": "scan",
+                                "using_join_cache": true,
+                                "buffers_needed": 384,
+                                "resulting_rows": 1473,
+                                "cost": 1.8053e8,
+                                "chosen": false
+                              }
+                            ]
+                          },
+                          "condition_filtering_pct": 100,
+                          "rows_for_plan": 1.22558e6,
+                          "cost_for_plan": 552576,
+                          "rest_of_plan": [
+                            {
+                              "plan_prefix": [
+                                "`pom_order_huawei_bind` `a2`",
+                                "`pro_project` `c2`"
+                              ],
+                              "table": "`conm_contract` `b2`",
+                              "best_access_path": {
+                                "considered_access_paths": [
+                                  {
+                                    "access_type": "eq_ref",
+                                    "index": "PRIMARY",
+                                    "rows": 1,
+                                    "cost": 428953,
+                                    "chosen": true,
+                                    "cause": "clustered_pk_chosen_by_heuristics"
+                                  },
+                                  {
+                                    "access_type": "scan",
+                                    "chosen": false,
+                                    "cause": "covering_index_better_than_full_scan"
+                                  }
+                                ]
+                              },
+                              "added_to_eq_ref_extension": true,
+                              "condition_filtering_pct": 100,
+                              "rows_for_plan": 1.22558e6,
+                              "cost_for_plan": 981529,
+                              "rest_of_plan": [
+                                {
+                                  "plan_prefix": [
+                                    "`pom_order_huawei_bind` `a2`",
+                                    "`pro_project` `c2`",
+                                    "`conm_contract` `b2`"
+                                  ],
+                                  "table": " `invoice_bind`",
+                                  "best_access_path": {
+                                    "considered_access_paths": [
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key0>",
+                                        "rows": 10,
+                                        "cost": 4.28953e6,
+                                        "chosen": true
+                                      },
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key1>",
+                                        "rows": 10,
+                                        "cost": 4.28953e6,
+                                        "chosen": false
+                                      },
+                                      {
+                                        "rows_to_scan": 1190500,
+                                        "access_type": "scan",
+                                        "using_join_cache": true,
+                                        "buffers_needed": 7640,
+                                        "resulting_rows": 1.1905e6,
+                                        "cost": 1.46019e11,
+                                        "chosen": false
+                                      }
+                                    ]
+                                  },
+                                  "added_to_eq_ref_extension": false
+                                },
+                                {
+                                  "plan_prefix": [
+                                    "`pom_order_huawei_bind` `a2`",
+                                    "`pro_project` `c2`",
+                                    "`conm_contract` `b2`"
+                                  ],
+                                  "table": " `invoice_bind`",
+                                  "best_access_path": {
+                                    "considered_access_paths": [
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key0>",
+                                        "rows": 10,
+                                        "cost": 4.28953e6,
+                                        "chosen": true
+                                      },
+                                      {
+                                        "access_type": "ref",
+                                        "index": "<auto_key1>",
+                                        "rows": 10,
+                                        "cost": 4.28953e6,
+                                        "chosen": false
+                                      },
+                                      {
+                                        "rows_to_scan": 1190500,
+                                        "access_type": "scan",
+                                        "using_join_cache": true,
+                                        "buffers_needed": 7640,
+                                        "resulting_rows": 1.1905e6,
+                                        "cost": 1.46019e11,
+                                        "chosen": false
+                                      }
+                                    ]
+                                  },
+                                  "condition_filtering_pct": 100,
+                                  "rows_for_plan": 1.22558e7,
+                                  "cost_for_plan": 5.27106e6,
+                                  "sort_cost": 1.22558e7,
+                                  "new_cost_for_plan": 1.75268e7,
+                                  "chosen": true
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "plan_prefix": ["`pom_order_huawei_bind` `a2`"],
+                          "table": " `invoice_bind`",
+                          "best_access_path": {
+                            "considered_access_paths": [
+                              {
+                                "access_type": "ref",
+                                "index": "<auto_key0>",
+                                "rows": 10,
+                                "cost": 4.28953e6,
+                                "chosen": true
+                              },
+                              {
+                                "access_type": "ref",
+                                "index": "<auto_key1>",
+                                "rows": 10,
+                                "cost": 4.28953e6,
+                                "chosen": false
+                              },
+                              {
+                                "rows_to_scan": 1190500,
+                                "access_type": "scan",
+                                "using_join_cache": true,
+                                "buffers_needed": 384,
+                                "resulting_rows": 1.1905e6,
+                                "cost": 1.45911e11,
+                                "chosen": false
+                              }
+                            ]
+                          },
+                          "condition_filtering_pct": 100,
+                          "rows_for_plan": 1.22558e7,
+                          "cost_for_plan": 4.41315e6,
+                          "pruned_by_heuristic": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "attaching_conditions_to_tables": {
+                    "original_condition": "((`c2`.`id` = `a2`.`projectid`) and (`b2`.`id` = `a2`.`contractid`))",
+                    "attached_conditions_computation": [],
+                    "attached_conditions_summary": [
+                      {
+                        "table": "`pom_order_huawei_bind` `a2`",
+                        "attached": "((`a2`.`projectid` is not null) and (`a2`.`contractid` is not null))"
+                      },
+                      {
+                        "table": "`pro_project` `c2`",
+                        "attached": "(`c2`.`id` = `a2`.`projectid`)"
+                      },
+                      {
+                        "table": "`conm_contract` `b2`",
+                        "attached": "(`b2`.`id` = `a2`.`contractid`)"
+                      },
+                      {
+                        "table": " `invoice_bind`",
+                        "attached": "<if>(is_not_null_compl(invoice_bind), (`invoice_bind`.`pom_id` = `a2`.`pom_id`), true)"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "optimizing_distinct_group_by_order_by": {
+                    "simplifying_group_by": {
+                      "original_clause": "`a2`.`pom_id_real`",
+                      "items": [
+                        {
+                          "item": "`a2`.`pom_id_real`"
+                        }
+                      ],
+                      "resulting_clause_is_simple": true,
+                      "resulting_clause": "`a2`.`pom_id_real`"
+                    }
+                  }
+                },
+                {
+                  "reconsidering_access_paths_for_index_ordering": {
+                    "clause": "GROUP BY",
+                    "steps": [],
+                    "index_order_summary": {
+                      "table": "`pom_order_huawei_bind` `a2`",
+                      "index_provides_order": false,
+                      "order_direction": "undefined",
+                      "index": "unknown",
+                      "plan_changed": false
+                    }
+                  }
+                },
+                {
+                  "finalizing_table_conditions": [
+                    {
+                      "table": "`pom_order_huawei_bind` `a2`",
+                      "original_table_condition": "((`a2`.`projectid` is not null) and (`a2`.`contractid` is not null))",
+                      "final_table_condition   ": "((`a2`.`projectid` is not null) and (`a2`.`contractid` is not null))"
+                    },
+                    {
+                      "table": "`pro_project` `c2`",
+                      "original_table_condition": "(`c2`.`id` = `a2`.`projectid`)",
+                      "final_table_condition   ": null
+                    },
+                    {
+                      "table": "`conm_contract` `b2`",
+                      "original_table_condition": "(`b2`.`id` = `a2`.`contractid`)",
+                      "final_table_condition   ": null
+                    },
+                    {
+                      "table": " `invoice_bind`",
+                      "original_table_condition": "<if>(is_not_null_compl(invoice_bind), (`invoice_bind`.`pom_id` = `a2`.`pom_id`), true)",
+                      "final_table_condition   ": null
+                    }
+                  ]
+                },
+                {
+                  "refine_plan": [
+                    {
+                      "table": "`pom_order_huawei_bind` `a2`"
+                    },
+                    {
+                      "table": "`pro_project` `c2`"
+                    },
+                    {
+                      "table": "`conm_contract` `b2`"
+                    },
+                    {
+                      "table": " `invoice_bind`"
+                    }
+                  ]
+                },
+                {
+                  "considering_tmp_tables": [
+                    {
+                      "creating_tmp_table": {
+                        "tmp_table_info": {
+                          "table": "intermediate_tmp_table",
+                          "columns": 1,
+                          "row_length": 768,
+                          "key_length": 0,
+                          "unique_constraint": false,
+                          "makes_grouped_rows": false,
+                          "cannot_insert_duplicates": false,
+                          "location": "TempTable"
+                        }
+                      }
+                    },
+                    {
+                      "creating_tmp_table": {
+                        "tmp_table_info": {
+                          "table": "intermediate_tmp_table",
+                          "columns": 1,
+                          "row_length": 768,
+                          "key_length": 0,
+                          "unique_constraint": false,
+                          "makes_grouped_rows": false,
+                          "cannot_insert_duplicates": false,
+                          "location": "TempTable"
+                        }
+                      }
+                    },
+                    {
+                      "creating_tmp_table": {
+                        "tmp_table_info": {
+                          "table": "intermediate_tmp_table",
+                          "columns": 1,
+                          "row_length": 110,
+                          "key_length": 0,
+                          "unique_constraint": false,
+                          "makes_grouped_rows": false,
+                          "cannot_insert_duplicates": false,
+                          "location": "TempTable"
+                        }
+                      }
+                    },
+                    {
+                      "creating_tmp_table": {
+                        "tmp_table_info": {
+                          "table": "intermediate_tmp_table",
+                          "columns": 1,
+                          "row_length": 11,
+                          "key_length": 0,
+                          "unique_constraint": false,
+                          "makes_grouped_rows": false,
+                          "cannot_insert_duplicates": false,
+                          "location": "TempTable"
+                        }
+                      }
+                    },
+                    {
+                      "adding_sort_to_table": "a2"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "join_optimization": {
+              "select#": 5,
+              "steps": [
+                {
+                  "condition_processing": {
+                    "condition": "WHERE",
+                    "original_condition": "(`conm_contract`.`contract_no_other` <> '')",
+                    "steps": [
+                      {
+                        "transformation": "equality_propagation",
+                        "resulting_condition": "(`conm_contract`.`contract_no_other` <> '')"
+                      },
+                      {
+                        "transformation": "constant_propagation",
+                        "resulting_condition": "(`conm_contract`.`contract_no_other` <> '')"
+                      },
+                      {
+                        "transformation": "trivial_condition_removal",
+                        "resulting_condition": "(`conm_contract`.`contract_no_other` <> '')"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "substitute_generated_columns": {}
+                },
+                {
+                  "table_dependencies": [
+                    {
+                      "table": "`conm_contract`",
+                      "row_may_be_null": false,
+                      "map_bit": 0,
+                      "depends_on_map_bits": []
+                    }
+                  ]
+                },
+                {
+                  "ref_optimizer_key_uses": []
+                },
+                {
+                  "rows_estimation": [
+                    {
+                      "table": "`conm_contract`",
+                      "range_analysis": {
+                        "table_scan": {
+                          "rows": 12649,
+                          "cost": 1371.25
+                        },
+                        "potential_range_indexes": [
+                          {
+                            "index": "PRIMARY",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "conm_contract_unique",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "conm_contract$1",
+                            "usable": true,
+                            "key_parts": ["contract_no_other", "id"]
+                          }
+                        ],
+                        "setup_range_conditions": [],
+                        "group_index_range": {},
+                        "skip_scan_range": {
+                          "chosen": false,
+                          "cause": "has_group_by"
+                        },
+                        "analyzing_range_alternatives": {
+                          "range_scan_alternatives": [
+                            {
+                              "index": "conm_contract$1",
+                              "ranges": [
+                                "NULL < contract_no_other < ''",
+                                "'' < contract_no_other"
+                              ],
+                              "index_dives_for_eq_ranges": true,
+                              "rowid_ordered": false,
+                              "using_mrr": false,
+                              "index_only": false,
+                              "in_memory": 1,
+                              "rows": 6325,
+                              "cost": 2214.26,
+                              "chosen": false,
+                              "cause": "cost"
+                            }
+                          ],
+                          "analyzing_roworder_intersect": {
+                            "usable": false,
+                            "cause": "too_few_roworder_scans"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "considered_execution_plans": [
+                    {
+                      "plan_prefix": [],
+                      "table": "`conm_contract`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "rows_to_scan": 12649,
+                            "filtering_effect": [],
+                            "final_filtering_effect": 0.50004,
+                            "access_type": "scan",
+                            "resulting_rows": 6325,
+                            "cost": 1369.15,
+                            "chosen": true,
+                            "use_tmp_table": true
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 6325,
+                      "cost_for_plan": 1369.15,
+                      "sort_cost": 6325,
+                      "new_cost_for_plan": 7694.15,
+                      "chosen": true
+                    }
+                  ]
+                },
+                {
+                  "attaching_conditions_to_tables": {
+                    "original_condition": "(`conm_contract`.`contract_no_other` <> '')",
+                    "attached_conditions_computation": [],
+                    "attached_conditions_summary": [
+                      {
+                        "table": "`conm_contract`",
+                        "attached": "(`conm_contract`.`contract_no_other` <> '')"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "optimizing_distinct_group_by_order_by": {
+                    "simplifying_group_by": {
+                      "original_clause": "`conm_contract`.`contract_no_other`",
+                      "items": [
+                        {
+                          "item": "`conm_contract`.`contract_no_other`"
+                        }
+                      ],
+                      "resulting_clause_is_simple": true,
+                      "resulting_clause": "`conm_contract`.`contract_no_other`"
+                    }
+                  }
+                },
+                {
+                  "reconsidering_access_paths_for_index_ordering": {
+                    "clause": "GROUP BY",
+                    "steps": [
+                      {
+                        "rows_estimation": {
+                          "table": "`conm_contract`",
+                          "index": "conm_contract$1",
+                          "range_analysis": {
+                            "table_scan": {
+                              "rows": 12649,
+                              "cost": 1371.25
+                            },
+                            "potential_range_indexes": [
+                              {
+                                "index": "PRIMARY",
+                                "usable": false,
+                                "cause": "not_applicable"
+                              },
+                              {
+                                "index": "conm_contract_unique",
+                                "usable": false,
+                                "cause": "not_applicable"
+                              },
+                              {
+                                "index": "conm_contract$1",
+                                "usable": true,
+                                "key_parts": ["contract_no_other", "id"]
+                              }
+                            ],
+                            "setup_range_conditions": [],
+                            "group_index_range": {},
+                            "skip_scan_range": {
+                              "chosen": false,
+                              "cause": "has_group_by"
+                            },
+                            "analyzing_range_alternatives": {
+                              "range_scan_alternatives": [
+                                {
+                                  "index": "conm_contract$1",
+                                  "ranges": [
+                                    "NULL < contract_no_other < ''",
+                                    "'' < contract_no_other"
+                                  ],
+                                  "index_dives_for_eq_ranges": true,
+                                  "rowid_ordered": false,
+                                  "using_mrr": false,
+                                  "index_only": false,
+                                  "in_memory": 1,
+                                  "rows": 6325,
+                                  "cost": 2214.26,
+                                  "chosen": false,
+                                  "cause": "cost"
+                                }
+                              ],
+                              "analyzing_roworder_intersect": {
+                                "usable": false,
+                                "cause": "too_few_roworder_scans"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "index_order_summary": {
+                      "table": "`conm_contract`",
+                      "index_provides_order": true,
+                      "order_direction": "asc",
+                      "index": "conm_contract$1",
+                      "plan_changed": true,
+                      "access_type": "index"
+                    }
+                  }
+                },
+                {
+                  "finalizing_table_conditions": [
+                    {
+                      "table": "`conm_contract`",
+                      "original_table_condition": "(`conm_contract`.`contract_no_other` <> '')",
+                      "final_table_condition   ": "(`conm_contract`.`contract_no_other` <> '')"
+                    }
+                  ]
+                },
+                {
+                  "refine_plan": [
+                    {
+                      "table": "`conm_contract`"
+                    }
+                  ]
+                },
+                {
+                  "considering_tmp_tables": []
+                }
+              ]
+            }
+          },
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": null,
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "resulting_condition": null
+                }
+              ]
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`polist_huawei`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": []
+              },
+              {
+                "table": " `c`",
+                "row_may_be_null": true,
+                "map_bit": 1,
+                "depends_on_map_bits": [0]
+              },
+              {
+                "table": "`sys_department`",
+                "row_may_be_null": true,
+                "map_bit": 2,
+                "depends_on_map_bits": [0, 1]
+              },
+              {
+                "table": "`v_icm_pom_get_table` `g`",
+                "row_may_be_null": true,
+                "map_bit": 3,
+                "depends_on_map_bits": [0, 1, 2]
+              },
+              {
+                "table": " `y`",
+                "row_may_be_null": true,
+                "map_bit": 4,
+                "depends_on_map_bits": [0, 1, 2, 3]
+              },
+              {
+                "table": " `z`",
+                "row_may_be_null": true,
+                "map_bit": 5,
+                "depends_on_map_bits": [0, 1, 2, 3, 4]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+              {
+                "table": " `c`",
+                "field": "pom_id",
+                "equals": "`polist_huawei`.`lineLocationId`",
+                "null_rejecting": true
+              },
+              {
+                "table": " `c`",
+                "field": "pom_id",
+                "equals": "`polist_huawei`.`lineLocationId`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`sys_department`",
+                "field": "id",
+                "equals": "`polist_huawei`.`department_id`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`v_icm_pom_get_table` `g`",
+                "field": "pom_id_real",
+                "equals": "`polist_huawei`.`lineLocationId`",
+                "null_rejecting": true
+              },
+              {
+                "table": " `y`",
+                "field": "pom_id",
+                "equals": "`polist_huawei`.`lineLocationId`",
+                "null_rejecting": true
+              },
+              {
+                "table": " `y`",
+                "field": "pom_id",
+                "equals": "`polist_huawei`.`lineLocationId`",
+                "null_rejecting": true
+              },
+              {
+                "table": " `z`",
+                "field": "contract_no_other",
+                "equals": "substr(`polist_huawei`.`subcontractNo`,1,32)",
+                "null_rejecting": true
+              }
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`polist_huawei`",
+                "table_scan": {
+                  "rows": 958499,
+                  "cost": 130110
+                }
+              },
+              {
+                "table": " `c`",
+                "table_scan": {
+                  "rows": 389,
+                  "cost": 7.3625
+                }
+              },
+              {
+                "table": "`sys_department`",
+                "table_scan": {
+                  "rows": 28,
+                  "cost": 0.25
+                }
+              },
+              {
+                "table": "`v_icm_pom_get_table` `g`",
+                "table_scan": {
+                  "rows": 1146460,
+                  "cost": 4326.14
+                }
+              },
+              {
+                "table": " `y`",
+                "table_scan": {
+                  "rows": 12255790,
+                  "cost": 153200
+                }
+              },
+              {
+                "table": " `z`",
+                "table_scan": {
+                  "rows": 6324,
+                  "cost": 81.55
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [],
+                "table": "`polist_huawei`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "rows_to_scan": 958499,
+                      "access_type": "scan",
+                      "resulting_rows": 958499,
+                      "cost": 225960,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 958499,
+                "cost_for_plan": 225960,
+                "rest_of_plan": [
+                  {
+                    "plan_prefix": ["`polist_huawei`"],
+                    "table": " `c`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "<auto_key0>",
+                          "rows": 10.2368,
+                          "cost": 3.4342e6,
+                          "chosen": true
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "<auto_key1>",
+                          "rows": 10.2368,
+                          "cost": 3.4342e6,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 389,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 28294,
+                          "resulting_rows": 389,
+                          "cost": 3.74939e7,
+                          "chosen": false
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 9.812e6,
+                    "cost_for_plan": 3.66016e6,
+                    "rest_of_plan": [
+                      {
+                        "plan_prefix": ["`polist_huawei`", " `c`"],
+                        "table": "`sys_department`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "eq_ref",
+                              "index": "PRIMARY",
+                              "rows": 1,
+                              "cost": 1.22083e6,
+                              "chosen": true,
+                              "cause": "clustered_pk_chosen_by_heuristics"
+                            },
+                            {
+                              "rows_to_scan": 28,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 319314,
+                              "resulting_rows": 28,
+                              "cost": 2.75534e7,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 9.812e6,
+                        "cost_for_plan": 4.88099e6,
+                        "rest_of_plan": [
+                          {
+                            "plan_prefix": [
+                              "`polist_huawei`",
+                              " `c`",
+                              "`sys_department`"
+                            ],
+                            "table": "`v_icm_pom_get_table` `g`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "eq_ref",
+                                  "index": "$pom_id_real",
+                                  "rows": 1,
+                                  "cost": 1.93951e6,
+                                  "chosen": true,
+                                  "cause": "clustered_pk_chosen_by_heuristics"
+                                },
+                                {
+                                  "rows_to_scan": 1146460,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 348285,
+                                  "resulting_rows": 1.14646e6,
+                                  "cost": 1.12641e12,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "added_to_eq_ref_extension": false
+                          },
+                          {
+                            "plan_prefix": [
+                              "`polist_huawei`",
+                              " `c`",
+                              "`sys_department`"
+                            ],
+                            "table": "`v_icm_pom_get_table` `g`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "eq_ref",
+                                  "index": "$pom_id_real",
+                                  "rows": 1,
+                                  "cost": 1.93951e6,
+                                  "chosen": true,
+                                  "cause": "clustered_pk_chosen_by_heuristics"
+                                },
+                                {
+                                  "rows_to_scan": 1146460,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 348285,
+                                  "resulting_rows": 1.14646e6,
+                                  "cost": 1.12641e12,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 9.812e6,
+                            "cost_for_plan": 6.82049e6,
+                            "rest_of_plan": [
+                              {
+                                "plan_prefix": [
+                                  "`polist_huawei`",
+                                  " `c`",
+                                  "`sys_department`",
+                                  "`v_icm_pom_get_table` `g`"
+                                ],
+                                "table": " `y`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "ref",
+                                      "index": "<auto_key0>",
+                                      "rows": 12.7864,
+                                      "cost": 4.39112e7,
+                                      "chosen": true
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "<auto_key1>",
+                                      "rows": 12.7864,
+                                      "cost": 4.39112e7,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "rows_to_scan": 12255790,
+                                      "access_type": "scan",
+                                      "using_join_cache": true,
+                                      "buffers_needed": 380063,
+                                      "resulting_rows": 1.22558e7,
+                                      "cost": 1.20836e13,
+                                      "chosen": false
+                                    }
+                                  ]
+                                },
+                                "added_to_eq_ref_extension": false
+                              },
+                              {
+                                "plan_prefix": [
+                                  "`polist_huawei`",
+                                  " `c`",
+                                  "`sys_department`",
+                                  "`v_icm_pom_get_table` `g`"
+                                ],
+                                "table": " `y`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "ref",
+                                      "index": "<auto_key0>",
+                                      "rows": 12.7864,
+                                      "cost": 4.39112e7,
+                                      "chosen": true
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "<auto_key1>",
+                                      "rows": 12.7864,
+                                      "cost": 4.39112e7,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "rows_to_scan": 12255790,
+                                      "access_type": "scan",
+                                      "using_join_cache": true,
+                                      "buffers_needed": 380063,
+                                      "resulting_rows": 1.22558e7,
+                                      "cost": 1.20836e13,
+                                      "chosen": false
+                                    }
+                                  ]
+                                },
+                                "condition_filtering_pct": 100,
+                                "rows_for_plan": 1.25461e8,
+                                "cost_for_plan": 5.07317e7,
+                                "rest_of_plan": [
+                                  {
+                                    "plan_prefix": [
+                                      "`polist_huawei`",
+                                      " `c`",
+                                      "`sys_department`",
+                                      "`v_icm_pom_get_table` `g`",
+                                      " `y`"
+                                    ],
+                                    "table": " `z`",
+                                    "best_access_path": {
+                                      "considered_access_paths": [
+                                        {
+                                          "access_type": "ref",
+                                          "index": "<auto_key0>",
+                                          "rows": 10.0063,
+                                          "cost": 4.3939e8,
+                                          "chosen": true
+                                        },
+                                        {
+                                          "rows_to_scan": 6324,
+                                          "access_type": "scan",
+                                          "using_join_cache": true,
+                                          "buffers_needed": 4919470,
+                                          "resulting_rows": 6324,
+                                          "cost": 7.97425e10,
+                                          "chosen": false
+                                        }
+                                      ]
+                                    },
+                                    "condition_filtering_pct": 100,
+                                    "rows_for_plan": 1.2554e9,
+                                    "cost_for_plan": 4.90122e8,
+                                    "chosen": true
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "condition_on_constant_tables": "true",
+            "condition_value": true
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "true",
+              "attached_conditions_computation": [],
+              "attached_conditions_summary": [
+                {
+                  "table": "`polist_huawei`",
+                  "attached": null
+                },
+                {
+                  "table": " `c`",
+                  "attached": "<if>(is_not_null_compl(c), (`polist_huawei`.`lineLocationId` = `c`.`pom_id`), true)"
+                },
+                {
+                  "table": "`sys_department`",
+                  "attached": "<if>(is_not_null_compl(sys_department), (`sys_department`.`id` = `polist_huawei`.`department_id`), true)"
+                },
+                {
+                  "table": "`v_icm_pom_get_table` `g`",
+                  "attached": "<if>(is_not_null_compl(g), (`polist_huawei`.`lineLocationId` = `g`.`pom_id_real`), true)"
+                },
+                {
+                  "table": " `y`",
+                  "attached": "<if>(is_not_null_compl(y), (`polist_huawei`.`lineLocationId` = `y`.`pom_id`), true)"
+                },
+                {
+                  "table": " `z`",
+                  "attached": "<if>(is_not_null_compl(z), (substr(`polist_huawei`.`subcontractNo`,1,32) = `z`.`contract_no_other`), true)"
+                }
+              ]
+            }
+          },
+          {
+            "finalizing_table_conditions": [
+              {
+                "table": " `c`",
+                "original_table_condition": "<if>(is_not_null_compl(c), (`polist_huawei`.`lineLocationId` = `c`.`pom_id`), true)",
+                "final_table_condition   ": "<if>(is_not_null_compl(c), (`polist_huawei`.`lineLocationId` = `c`.`pom_id`), true)"
+              },
+              {
+                "table": "`sys_department`",
+                "original_table_condition": "<if>(is_not_null_compl(sys_department), (`sys_department`.`id` = `polist_huawei`.`department_id`), true)",
+                "final_table_condition   ": null
+              },
+              {
+                "table": "`v_icm_pom_get_table` `g`",
+                "original_table_condition": "<if>(is_not_null_compl(g), (`polist_huawei`.`lineLocationId` = `g`.`pom_id_real`), true)",
+                "final_table_condition   ": "<if>(is_not_null_compl(g), (`polist_huawei`.`lineLocationId` = `g`.`pom_id_real`), true)"
+              },
+              {
+                "table": " `y`",
+                "original_table_condition": "<if>(is_not_null_compl(y), (`polist_huawei`.`lineLocationId` = `y`.`pom_id`), true)",
+                "final_table_condition   ": "<if>(is_not_null_compl(y), (`polist_huawei`.`lineLocationId` = `y`.`pom_id`), true)"
+              },
+              {
+                "table": " `z`",
+                "original_table_condition": "<if>(is_not_null_compl(z), (substr(`polist_huawei`.`subcontractNo`,1,32) = `z`.`contract_no_other`), true)",
+                "final_table_condition   ": "<if>(is_not_null_compl(z), (substr(`polist_huawei`.`subcontractNo`,1,32) = `z`.`contract_no_other`), true)"
+              }
+            ]
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`polist_huawei`"
+              },
+              {
+                "table": " `c`"
+              },
+              {
+                "table": "`sys_department`"
+              },
+              {
+                "table": "`v_icm_pom_get_table` `g`"
+              },
+              {
+                "table": " `y`"
+              },
+              {
+                "table": " `z`"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_execution": {
+        "select#": 1,
+        "steps": [
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "table": " `c`",
+                "in_plan_at_position": 1,
+                "columns": 3,
+                "row_length": 788,
+                "key_length": 767,
+                "unique_constraint": false,
+                "makes_grouped_rows": false,
+                "cannot_insert_duplicates": false,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "materialize": {
+              "select#": 2,
+              "steps": []
+            }
+          },
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "table": " `y`",
+                "in_plan_at_position": 4,
+                "columns": 6,
+                "row_length": 120,
+                "key_length": 63,
+                "unique_constraint": false,
+                "makes_grouped_rows": false,
+                "cannot_insert_duplicates": false,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "materialize": {
+              "select#": 3,
+              "steps": [
+                {
+                  "sorting_table": "a2",
+                  "filesort_information": [
+                    {
+                      "direction": "asc",
+                      "expression": "`a2`.`pom_id_real`"
+                    }
+                  ],
+                  "filesort_priority_queue_optimization": {
+                    "usable": false,
+                    "cause": "not applicable (no LIMIT)"
+                  },
+                  "filesort_execution": [],
+                  "filesort_summary": {
+                    "memory_available": 262144,
+                    "key_size": 481,
+                    "row_size": 571,
+                    "max_rows_per_buffer": 459,
+                    "num_rows_estimate": 1225579,
+                    "num_rows_found": 1226367,
+                    "num_initial_chunks_spilled_to_disk": 2495,
+                    "peak_memory_used": 264016,
+                    "sort_algorithm": "std::stable_sort",
+                    "sort_mode": "<fixed_sort_key, packed_additional_fields>"
+                  }
+                },
+                {
+                  "creating_tmp_table": {
+                    "tmp_table_info": {
+                      "table": " `invoice_bind`",
+                      "in_plan_at_position": 3,
+                      "columns": 3,
+                      "row_length": 25,
+                      "key_length": 4,
+                      "unique_constraint": false,
+                      "makes_grouped_rows": false,
+                      "cannot_insert_duplicates": false,
+                      "location": "TempTable"
+                    }
+                  }
+                },
+                {
+                  "materialize": {
+                    "select#": 4,
+                    "steps": [
+                      {
+                        "sorting_table": "b9",
+                        "filesort_information": [
+                          {
+                            "direction": "asc",
+                            "expression": "`b9`.`pom_id`"
+                          }
+                        ],
+                        "filesort_priority_queue_optimization": {
+                          "usable": false,
+                          "cause": "not applicable (no LIMIT)"
+                        },
+                        "filesort_execution": [],
+                        "filesort_summary": {
+                          "memory_available": 262144,
+                          "key_size": 8,
+                          "row_size": 20,
+                          "max_rows_per_buffer": 13107,
+                          "num_rows_estimate": 1190500,
+                          "num_rows_found": 1196144,
+                          "num_initial_chunks_spilled_to_disk": 145,
+                          "peak_memory_used": 285072,
+                          "sort_algorithm": "std::stable_sort",
+                          "unpacked_addon_fields": "skip_heuristic",
+                          "sort_mode": "<fixed_sort_key, additional_fields>"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "table": " `z`",
+                "in_plan_at_position": 5,
+                "columns": 3,
+                "row_length": 1539,
+                "key_length": 768,
+                "unique_constraint": false,
+                "makes_grouped_rows": false,
+                "cannot_insert_duplicates": false,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "materialize": {
+              "select#": 5,
+              "steps": []
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
