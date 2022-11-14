@@ -2,9 +2,9 @@
 
 <https://dev.mysql.com/doc/refman/8.0/en/statement-optimization.html>
 
-- 8.2.1 [优化 SELECT 语句](优化select语句.md)
+- 8.2.1 [优化 SELECT 语句](优化select语句/优化select语句.md)
 - 8.2.2 [优化子查询、派生表、视图引用和公用表表达式](优化子查询、派生表、视图引用和公用表表达式/优化子查询、派生表、视图引用和公用表表达式.md)
-- 8.2.3 优化 INFORMATION_SCHEMA 查询
+- 8.2.3 [优化 INFORMATION_SCHEMA 查询](优化INFORMATION_SCHEMA查询.md)
 - 8.2.4 优化性能模式查询
 - 8.2.5 优化数据变更语句
 - 8.2.6 优化数据库权限
