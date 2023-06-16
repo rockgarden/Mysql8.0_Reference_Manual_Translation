@@ -22,9 +22,9 @@
 
 - 从另一个 MySQL 服务器实例导入表时，两个 MySQL 服务器实例必须具有通用可用性 (GA) 状态并且必须是相同的版本。否则，表必须在导入它的同一个 MySQL 服务器实例上创建。
 
-- 如果表是通过在 CREATE TABLE 语句中指定 DATA DIRECTORY 子句在外部目录中创建的，那么您在目标实例上替换的表必须使用相同的 DATA DIRECTORY 子句定义。如果子句不匹配，则会报告架构不匹配错误。要确定源表是否使用 DATA DIRECTORY 子句定义，请使用 SHOW CREATE TABLE 查看表定义。有关使用 DATA DIRECTORY 子句的信息，请参阅[第 15.6.1.2 节，“在外部创建表”](https://dev.mysql.com/doc/refman/8.0/en/innodb-create-table-external.html)。
+- 如果表是通过在 CREATE TABLE 语句中指定 DATA DIRECTORY 子句在外部目录中创建的，那么您在目标实例上替换的表必须使用相同的 DATA DIRECTORY 子句定义。如果子句不匹配，则会报告架构不匹配错误。要确定源表是否使用 DATA DIRECTORY 子句定义，请使用 SHOW CREATE TABLE 查看表定义。
 
-- 如果未在表定义中显式定义 ROW_FORMAT 选项或使用 ROW_FORMAT=DEFAULT，则源实例和目标实例上的 innodb_default_row_format 设置必须相同。否则，当您尝试导入操作时会报告架构不匹配错误。使用 SHOW CREATE TABLE 检查表定义。使用 SHOW VARIABLES 检查 innodb_default_row_format 设置。有关相关信息，请参阅[定义表的行格式](https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html#innodb-row-format-defining)。
+- 如果未在表定义中显式定义 ROW_FORMAT 选项或使用 ROW_FORMAT=DEFAULT，则源实例和目标实例上的 innodb_default_row_format 设置必须相同。否则，当您尝试导入操作时会报告架构不匹配错误。使用 SHOW CREATE TABLE 检查表定义。使用 SHOW VARIABLES 检查 innodb_default_row_format 设置。
 
 ## 导入表
 
@@ -50,14 +50,14 @@
    FLUSH TABLES ... FOR EXPORT 确保对命名表的更改刷新到磁盘，以便在服务器运行时可以制作二进制表副本。当 FLUSH TABLES ... FOR EXPORT 运行时，InnoDB 在表的模式目录中生成一个 .cfg 元数据文件。 .cfg 文件包含在导入操作期间用于架构验证的元数据。
 
    > 笔记
-   执行 FLUSH TABLES ... FOR EXPORT 的连接必须在操作运行时保持打开状态；否则，.cfg 文件将被删除，因为在连接关闭时会释放锁。
+     执行 FLUSH TABLES ... FOR EXPORT 的连接必须在操作运行时保持打开状态；否则，.cfg 文件将被删除，因为在连接关闭时会释放锁。
 
 4. 将 .ibd 文件和 .cfg 元数据文件从源实例复制到目标实例。例如：
    `$> scp /path/to/datadir/test/t1.{ibd,cfg} destination-server:/path/to/datadir/test`
    必须在释放共享锁之前复制 .ibd 文件和 .cfg 文件，如下一步所述。
 
    > 笔记
-   如果您从加密的表空间导入表，InnoDB 会生成一个 .cfp 文件以及一个 .cfg 元数据文件。 .cfp 文件必须与 .cfg 文件一起复制到目标实例。 .cfp 文件包含一个传输密钥和一个加密的表空间密钥。导入时，InnoDB 使用传输密钥来解密表空间密钥。有关相关信息，请参阅[第 15.13 节，“InnoDB 静态数据加密”](https://dev.mysql.com/doc/refman/8.0/en/innodb-data-encryption.html)。
+     如果您从加密的表空间导入表，InnoDB 会生成一个 .cfp 文件以及一个 .cfg 元数据文件。 .cfp 文件必须与 .cfg 文件一起复制到目标实例。 .cfp 文件包含一个传输密钥和一个加密的表空间密钥。导入时，InnoDB 使用传输密钥来解密表空间密钥。有关相关信息，请参阅 [InnoDB 静态数据加密]。
 
 5. 在源实例上，使用 UNLOCK TABLES 释放 FLUSH TABLES ... FOR EXPORT 语句获取的锁：
 
@@ -153,7 +153,7 @@
 
 - 由于 .cfg 元数据文件的限制，在导入分区表时不会报告分区类型或分区定义差异的架构不匹配。报告列差异。
 
-- 在 MySQL 8.0.19 之前，索引键部分排序顺序信息不会存储到表空间导入操作期间使用的 .cfg 元数据文件中。因此，索引键部分的排序顺序被假定为升序，这是默认值。因此，如果导入操作中涉及的一个表是使用 DESC 索引键部分排序顺序定义的，而另一个表没有定义，则记录可能会以意外的顺序排序。解决方法是删除并重新创建受影响的索引。有关索引键部分排序顺序的信息，请参阅第 13.1.15 节，“CREATE INDEX 语句”。
+- 在 MySQL 8.0.19 之前，索引键部分排序顺序信息不会存储到表空间导入操作期间使用的 .cfg 元数据文件中。因此，索引键部分的排序顺序被假定为升序，这是默认值。因此，如果导入操作中涉及的一个表是使用 DESC 索引键部分排序顺序定义的，而另一个表没有定义，则记录可能会以意外的顺序排序。解决方法是删除并重新创建受影响的索引。
 
   .cfg 文件格式在 MySQL 8.0.19 中更新，包括索引键部分排序信息。上述问题不影响 MySQL 8.0.19 服务器实例或更高版本之间的导入操作。
 

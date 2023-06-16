@@ -44,7 +44,7 @@ shell> ls
 t1.ibd
 ```
 
-你可以使用 `CREATE TABLE`的`DATA DIRECTORY`子句来显示得在MySQL数据目录之外创建单文件表空间的数据文件。更多相关信息，请查阅 [第15.6.1.2节 创建外部的表](https://dev.mysql.com/doc/refman/8.0/en/innodb-create-table-external.html)。
+你可以使用 `CREATE TABLE`的`DATA DIRECTORY`子句来显示得在MySQL数据目录之外创建单文件表空间的数据文件。
 
 ## 单文件表表空间具备的优势
 
@@ -56,11 +56,11 @@ File-per-table 表空间与共享表空间（如系统表空间或通用表空�
 
 - 在驻留在每表文件表空间中的表上执行时，TRUNCATE TABLE 性能更好。
 
-- File-per-table 表空间数据文件可以在单独的存储设备上创建，用于 I/O 优化、空间管理或备份目的。请参阅[第 15.6.1.2 节，“在外部创建表”](https://dev.mysql.com/doc/refman/8.0/en/innodb-create-table-external.html)。
+- File-per-table 表空间数据文件可以在单独的存储设备上创建，用于 I/O 优化、空间管理或备份目的。
 
-- 您可以从另一个 MySQL 实例导入驻留在 file-per-table 表空间中的表。请参阅[第 15.6.1.3 节，“导入 InnoDB 表”](https://dev.mysql.com/doc/refman/8.0/en/innodb-table-import.html)。
+- 您可以从另一个 MySQL 实例导入驻留在 file-per-table 表空间中的表。
 
-- 在 file-per-table 表空间中创建的表支持与系统表空间不支持的 DYNAMIC 和 COMPRESSED 行格式相关的功能。请参阅[第 15.10 节，“InnoDB 行格式”](https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html)。
+- 在 file-per-table 表空间中创建的表支持系统表空间不支持的 DYNAMIC 和 COMPRESSED 行格式相关的功能。请参阅[第 15.10 节，“InnoDB 行格式”](https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html)。
 
 - 当发生数据损坏、备份或二进制日志不可用或 MySQL 服务器实例无法重新启动时，存储在单个表空间数据文件中的表可以节省时间并提高成功恢复的机会。
 
