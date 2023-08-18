@@ -175,7 +175,23 @@
 
 8. 运行一段时间后，将所有参数配置写入配置文件固化，并关闭非核心的监控功能。
 
-## View 优化
+## Session优化
+
+1. 查询会话临时表空间占用情况
+   `mysql> SELECT * FROM INFORMATION_SCHEMA.INNODB_SESSION_TEMP_TABLESPACES;`
+
+   | ID进程  | SPACE      | PATH                      | SIZE       | STATE  | PURPOSE   |
+   |--------|------------|---------------------------|------------|--------|-----------|
+   | 238696 | 4243767283 | .\innodb_temp\temp_3.ibt  | 1153433600 | ACTIVE | INTRINSIC |
+
+2. 查询进程（238696）
+    `SHOW FULL PROCESSLIST;`
+
+   | ID     | USER | HOST            | DB   | COMMAND | TIME  | STATE | INFO | EXECUTION_ENGINE |
+   |--------|------|-----------------|------|---------|-------|-------|------|------------------|
+   | 238696 | ecnt | localhost:63610 | ecnt | Sleep   | 22919 |       |      | PRIMARY          |
+
+## View优化
 
 ### v_pom_huawei
 
